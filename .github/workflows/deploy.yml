@@ -5,6 +5,7 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
+  issues: write
   pages: write
   id-token: write
 concurrency:
@@ -18,9 +19,12 @@ jobs:
       - uses: actions/checkout@v7
       - name: Build and upload static site
         uses: withastro/action@v6
+        env:
+          GH_TOKEN: ${{ github.token }}
         with:
           node-version: 24
           package-manager: pnpm@11.25.0
+          build-cmd: pnpm build && node scripts/sync-comments.mjs
   deploy:
     needs: build
     runs-on: ubuntu-latest

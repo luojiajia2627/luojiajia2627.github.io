@@ -1,0 +1,137 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import Comments from "@/components/Comments.astro";
+import { getDocuments, type BlogDocument } from "@/utils/getDocuments";
+export async function getStaticPaths() {
+  return (await getDocuments()).map(doc => ({
+    params: { slug: doc.slug },
+    props: { doc },
+  }));
+}
+const { doc } = Astro.props as { doc: BlogDocument };
+---
+
+<Layout
+  title={doc.title + " | PDF 资料库 · 罗佳佳 Lily"}
+  description={doc.description}
+>
+  <Header /><main id="main-content" class="app-layout collection-page pdf-page">
+    <a href="/library/" class="quiet-link back-link">← 返回 PDF 资料库</a>
+    <header class="pdf-heading">
+      <p class="eyebrow">PDF / READING COPY {doc.demo && "· 功能示例"}</p><h1>
+        {doc.title}
+      </h1><p>{doc.description}</p><div class="pdf-meta">
+        <span>PDF · {doc.sizeLabel}</span>{doc.date && <time>{doc.date}</time>}{
+          doc.tags.map(tag => <span>#{tag}</span>)
+        }
+      </div>
+    </header>
+    <div class="pdf-toolbar">
+      <span>文档阅读器</span><div>
+        <a href={doc.file} target="_blank" rel="noopener noreferrer"
+          >在新窗口打开 ↗</a
+        ><a class="lab-button" href={doc.file} download={doc.filename}
+          >下载 PDF ↓</a>
+      </div>
+    </div>
+    <object
+      class="pdf-reader"
+      data={doc.file + "#view=FitH"}
+      type="application/pdf"
+      aria-label={doc.title + " PDF 文档"}
+      ><div class="pdf-fallback">
+        <h2>在浏览器中打开这份文档</h2><p>
+          当前浏览器无法内嵌 PDF，可以用新窗口阅读，或下载到本地。
+        </p><a
+          class="lab-button"
+          href={doc.file}
+          target="_blank"
+          rel="noopener noreferrer">打开 PDF ↗</a>
+      </div></object
+    >
+    <p class="pdf-reader-note">
+      手机浏览器若未显示全部页面，请选择「在新窗口打开」。
+    </p>
+    <Comments title="读完之后，聊聊看" />
+  </main><Footer />
+</Layout>
+<style>
+  .back-link {
+    font-size: 12px;
+  }
+  .pdf-heading {
+    margin: 30px 0;
+  }
+  h1 {
+    font-size: clamp(25px, 4vw, 36px);
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    margin: 10px 0;
+    overflow-wrap: anywhere;
+  }
+  .pdf-heading > p:not(.eyebrow) {
+    color: var(--muted-foreground);
+    font-size: 14px;
+  }
+  .pdf-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-top: 20px;
+    font-size: 11px;
+    color: var(--muted-foreground);
+  }
+  .pdf-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border: 1px solid var(--border);
+    padding: 13px 16px;
+    font-size: 11px;
+    background: var(--surface);
+    gap: 16px;
+  }
+  .pdf-toolbar > div {
+    display: flex;
+    gap: 18px;
+    align-items: center;
+  }
+  .pdf-reader {
+    display: block;
+    width: 100%;
+    height: min(80vh, 920px);
+    min-height: 480px;
+    border: 1px solid var(--border);
+    border-top: 0;
+    background: var(--muted);
+  }
+  .pdf-fallback {
+    padding: 45px 24px;
+    text-align: center;
+  }
+  .pdf-fallback h2 {
+    font-size: 20px;
+  }
+  .pdf-fallback p {
+    font-size: 13px;
+    color: var(--muted-foreground);
+    margin: 16px 0 24px;
+  }
+  .pdf-reader-note {
+    font-size: 10px;
+    color: var(--muted-foreground);
+    margin-top: 10px;
+  }
+  @media (max-width: 520px) {
+    .pdf-toolbar {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .pdf-reader {
+      min-height: 430px;
+      height: 65vh;
+    }
+  }
+</style>

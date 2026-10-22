@@ -5,6 +5,9 @@ description: "记录问题、过程和结论，用一份轻量的 Markdown 模�
 category: 前后端开发
 tags: [Markdown, 写作, 博客]
 demo: true
+attachments:
+  - title: PDF 资料发布指南（功能示例）
+    file: /documents/publishing-guide.pdf
 draft: false
 ---
 

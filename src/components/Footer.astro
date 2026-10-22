@@ -32,6 +32,7 @@ const url = (path: string) =>
       </p>
     </div>
     <div class="footer-links">
+      <a href={url("categories")}>分类</a><a href={url("tags")}>标签</a>
       <a
         href="https://github.com/luojiajia2627"
         target="_blank"
@@ -55,7 +56,8 @@ const url = (path: string) =>
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    gap: 20px;
+    gap: 16px;
+    flex-wrap: wrap;
   }
   .credits {
     font-size: 10px;

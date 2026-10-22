@@ -1,0 +1,180 @@
+---
+const points = Array.from({ length: 81 }, (_, i) => {
+  const x = i % 9;
+  const y = Math.floor(i / 9);
+  const lit = (x === 2 && y >= 1 && y <= 7) || (y === 7 && x >= 2 && x <= 6);
+  return {
+    x: 46 + x * 24,
+    y: 44 + y * 24,
+    lit,
+    noise: ((i * 37 + 19) % 83) / 83,
+  };
+});
+---
+
+<figure class="lab-diagram" data-lab-diagram>
+  <figcaption>
+    <span>FIG. 01 / FROM NOISE TO IDEA</span><span
+      class="diagram-cross"
+      aria-hidden="true">＋</span>
+  </figcaption>
+  <div class="diagram-canvas">
+    <svg
+      viewBox="0 0 285 285"
+      role="img"
+      aria-label="从散点中显现字母 L 的互动图形，概念示意"
+      ><defs
+        ><pattern
+          id="lab-grid"
+          width="24"
+          height="24"
+          patternUnits="userSpaceOnUse"
+          ><path
+            d="M 24 0 L 0 0 0 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width=".4"
+            opacity=".17"></path></pattern
+        ></defs
+      ><rect x="22" y="20" width="240" height="240" fill="url(#lab-grid)"
+      ></rect>{
+        points.map(point => (
+          <circle
+            cx={point.x}
+            cy={point.y}
+            r={point.lit ? 4.8 : 2.3}
+            fill="currentColor"
+            opacity={point.lit ? 1 : 0.08}
+            data-lit={point.lit}
+            data-noise={point.noise}
+          />
+        ))
+      }<path
+        d="M 15 40 V 13 H 42 M 243 13 H 270 V 40 M 270 241 V 268 H 243 M 42 268 H 15 V 241"
+        fill="none"
+        stroke="currentColor"
+        opacity=".5"
+        stroke-width="1"></path></svg
+    ><span class="axis-y" aria-hidden="true">EXPLORE → UNDERSTAND</span>
+  </div>
+  <div class="diagram-controls">
+    <label for="clarity"
+      >思考的清晰度 <output for="clarity" data-clarity-output>80%</output
+      ></label
+    ><input
+      type="range"
+      min="0"
+      max="100"
+      value="80"
+      id="clarity"
+      aria-label="调整图形的清晰度"
+    /><div><span>NOISE</span><span>STRUCTURE</span></div>
+  </div>
+  <p class="diagram-footnote">
+    拖动试试。让零散的线索，慢慢有形。<span>概念示意</span>
+  </p>
+</figure>
+<script>
+  document.addEventListener("astro:page-load", () => {
+    const figure = document.querySelector("[data-lab-diagram]");
+    const slider = figure?.querySelector<HTMLInputElement>("input");
+    if (!figure || !slider) return;
+    const draw = () => {
+      const clarity = Number(slider.value) / 100;
+      figure.querySelectorAll<SVGCircleElement>("circle").forEach(point => {
+        const lit = point.dataset.lit === "true";
+        const noise = Number(point.dataset.noise);
+        point.setAttribute(
+          "opacity",
+          String((1 - clarity) * noise * 0.8 + clarity * (lit ? 1 : 0.08))
+        );
+        point.setAttribute(
+          "r",
+          String((1 - clarity) * (2 + noise * 3) + clarity * (lit ? 4.8 : 2.3))
+        );
+      });
+      figure.querySelector("output")!.textContent = slider.value + "%";
+    };
+    slider.addEventListener("input", draw);
+    draw();
+  });
+</script>
+<style>
+  .lab-diagram {
+    color: var(--accent);
+    border: 1px solid var(--border);
+    background: var(--surface);
+    width: 100%;
+    position: relative;
+    box-shadow: 7px 7px 0 var(--muted);
+  }
+  figcaption {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 17px;
+    font: 8px var(--font-mono);
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid var(--border);
+  }
+  .diagram-cross {
+    font-size: 15px;
+    line-height: 1;
+  }
+  .diagram-canvas {
+    position: relative;
+    padding: 9px 23px 0 9px;
+  }
+  svg {
+    width: 100%;
+    max-height: 280px;
+  }
+  .axis-y {
+    position: absolute;
+    right: 13px;
+    top: 45px;
+    writing-mode: vertical-rl;
+    font: 7px var(--font-mono);
+    letter-spacing: 0.15em;
+    opacity: 0.65;
+  }
+  .diagram-controls {
+    padding: 0 23px 17px;
+  }
+  label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+  }
+  output {
+    font-family: var(--font-mono);
+  }
+  input {
+    width: 100%;
+    height: 16px;
+    accent-color: var(--accent);
+    cursor: ew-resize;
+    margin-top: 9px;
+  }
+  .diagram-controls > div {
+    display: flex;
+    justify-content: space-between;
+    font: 7px var(--font-mono);
+    color: var(--muted-foreground);
+    margin-top: 5px;
+    letter-spacing: 0.1em;
+  }
+  .diagram-footnote {
+    font-size: 9px;
+    border-top: 1px solid var(--border);
+    padding: 13px 17px;
+    color: var(--muted-foreground);
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .diagram-footnote span {
+    font-size: 8px;
+    white-space: nowrap;
+  }
+</style>

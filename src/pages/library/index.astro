@@ -1,0 +1,229 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import { getDocuments } from "@/utils/getDocuments";
+const documents = await getDocuments();
+---
+
+<Layout
+  title="PDF 资料库 | 罗佳佳 Lily"
+  description="研究笔记、阅读资料与文档的归档。在线阅读 PDF，也可以下载后慢慢看。"
+>
+  <Header />
+  <main id="main-content" class="app-layout collection-page">
+    <div class="page-heading">
+      <div>
+        <p class="eyebrow">03 / THE READING ROOM</p><h1>
+          把资料，放在手边<span>。</span>
+        </h1><p>论文批注、学习笔记与值得回看的文档。</p>
+      </div><span class="catalog-number" aria-hidden="true"
+        >PDF<br /><small
+          >LIBRARY / {String(documents.length).padStart(2, "0")}</small
+        ></span>
+    </div>
+    <div class="collection-toolbar">
+      <span>{documents.length} 份文档 · 在线阅读 / 下载</span><a
+        href="https://github.com/luojiajia2627/luojiajia2627.github.io/upload/main/public/documents"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="quiet-link"
+        >上传 PDF <span class="owner-label">作者入口</span> ↗</a>
+    </div>
+    <ul class="document-grid">
+      {
+        documents.map((doc, index) => (
+          <li class="document-card">
+            <>
+              <a href={doc.url}>
+                <>
+                  <div class="document-cover" aria-hidden="true">
+                    <>
+                      <span>FILE / {String(index + 1).padStart(2, "0")}</span>
+                      <div class="paper-sheet">
+                        <>
+                          <span>PDF</span>
+                          <i />
+                          <i />
+                          <i />
+                          <i />
+                        </>
+                      </div>
+                      <span>{doc.sizeLabel} ↗</span>
+                    </>
+                  </div>
+                  <div class="document-info">
+                    <>
+                      <div class="document-type">
+                        PDF DOCUMENT {doc.demo && <span>功能示例</span>}
+                      </div>
+                      <h2>{doc.title}</h2>
+                      <p>{doc.description}</p>
+                      <div class="document-tags">
+                        {doc.tags.map(tag => (
+                          <span>#{tag}</span>
+                        ))}
+                      </div>
+                    </>
+                  </div>
+                </>
+              </a>
+              <div class="document-actions">
+                <>
+                  <a href={doc.url}>在线阅读 →</a>
+                  <a href={doc.file} download={doc.filename}>
+                    下载 ↓
+                  </a>
+                </>
+              </div>
+            </>
+          </li>
+        ))
+      }
+    </ul>
+    {
+      documents.length === 0 && (
+        <div class="empty-state">
+          <>
+            <span aria-hidden="true">＋</span>
+            <h2>下一份值得收藏的资料</h2>
+            <p>PDF 上传后，会自动出现在这里。</p>
+          </>
+        </div>
+      )
+    }
+    <aside class="library-note">
+      <span aria-hidden="true">↳</span><p>
+        适合保存长篇阅读。短一点的观点，留在<a href="/thoughts/">个人思考</a
+        >；完整的探索过程，写成<a href="/posts/">技术文章</a>。
+      </p>
+    </aside>
+  </main><Footer />
+</Layout>
+<style>
+  .catalog-number {
+    font: 50px var(--font-mono);
+    color: var(--accent);
+    line-height: 1.2;
+  }
+  .catalog-number small {
+    font-size: 9px;
+    letter-spacing: 0.12em;
+  }
+  .document-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 22px;
+    padding-top: 28px;
+  }
+  .document-card {
+    border: 1px solid var(--border);
+    background: var(--surface);
+    transition:
+      border-color 0.2s,
+      transform 0.2s;
+  }
+  .document-card:hover {
+    border-color: var(--accent);
+    transform: translateY(-3px);
+  }
+  .document-cover {
+    padding: 15px 18px;
+    background-color: var(--muted);
+    background-image:
+      linear-gradient(var(--grid-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+    background-size: 20px 20px;
+    height: 190px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: space-between;
+    font: 9px var(--font-mono);
+    color: var(--muted-foreground);
+  }
+  .document-cover > span:last-child {
+    align-self: flex-end;
+  }
+  .paper-sheet {
+    margin: -4px auto;
+    width: 81px;
+    height: 108px;
+    background: var(--surface);
+    border: 1px solid var(--accent);
+    box-shadow: 5px 5px 0 var(--border);
+    padding: 13px;
+    transform: rotate(-7deg);
+    color: var(--accent);
+    font-size: 17px;
+  }
+  .paper-sheet i {
+    display: block;
+    height: 1px;
+    background: var(--border);
+    margin-top: 7px;
+  }
+  .paper-sheet i:last-child {
+    width: 65%;
+  }
+  .document-info {
+    padding: 20px 20px 15px;
+  }
+  .document-type {
+    font: 9px var(--font-mono);
+    letter-spacing: 0.08em;
+    color: var(--accent);
+    display: flex;
+    justify-content: space-between;
+  }
+  .document-type span {
+    letter-spacing: 0;
+    color: var(--muted-foreground);
+  }
+  h2 {
+    font-size: 17px;
+    font-weight: 600;
+    margin: 11px 0 8px;
+    overflow-wrap: anywhere;
+  }
+  .document-info p {
+    font-size: 12px;
+    line-height: 1.9;
+    color: var(--muted-foreground);
+  }
+  .document-tags {
+    display: flex;
+    gap: 9px;
+    flex-wrap: wrap;
+    font-size: 10px;
+    color: var(--muted-foreground);
+    margin-top: 15px;
+  }
+  .document-actions {
+    margin: 0 20px;
+    border-top: 1px solid var(--border);
+    padding: 13px 0;
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+  }
+  .document-actions a:first-child {
+    color: var(--accent);
+  }
+  @media (max-width: 760px) {
+    .document-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .catalog-number {
+      display: none;
+    }
+  }
+  @media (max-width: 480px) {
+    .document-grid {
+      grid-template-columns: 1fr;
+    }
+    .document-cover {
+      height: 180px;
+    }
+  }
+</style>

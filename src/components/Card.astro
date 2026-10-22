@@ -23,7 +23,8 @@ const date = new Intl.DateTimeFormat("zh-CN", {
       href={getRelativeLocaleUrl(
         locale,
         "categories/" + slugifyStr(data.category)
-      )}>{data.category}</a>
+      )}>{data.category}</a
+    >
   </div>
   <div class="post-info">
     <a href={getPostUrl(id, filePath, locale)} class="post-title"
@@ -49,10 +50,10 @@ const date = new Intl.DateTimeFormat("zh-CN", {
 <style>
   .post-row {
     display: grid;
-    grid-template-columns: 104px minmax(0, 1fr);
+    grid-template-columns: 112px minmax(0, 1fr);
     gap: 26px;
     border-bottom: 1px solid var(--border);
-    padding: 30px 0;
+    padding: 29px 0;
   }
   .post-meta {
     display: flex;
@@ -81,7 +82,7 @@ const date = new Intl.DateTimeFormat("zh-CN", {
   }
   .post-title :global(h2),
   .post-title :global(h3) {
-    font-size: 19px;
+    font-size: 20px;
     font-weight: 550;
     letter-spacing: -0.02em;
   }

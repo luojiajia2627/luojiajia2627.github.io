@@ -1,6 +1,6 @@
 # 罗佳佳 Lily · 技术博客
 
-极简中文技术博客，围绕**扩散语言模型、推荐算法、前后端开发**组织内容。基于 [AstroPaper](https://github.com/satnaing/astro-paper) 的 MIT 开源模板定制，保留原始 LICENSE 与署名。
+冷白与钴蓝的个人实验室风格技术博客，围绕**扩散语言模型、推荐算法、前后端开发**组织内容。基于 [AstroPaper](https://github.com/satnaing/astro-paper) 的 MIT 开源模板定制，保留原始 LICENSE 与署名。
 
 正式发布地址配置为 **https://luojiajia2627.github.io/**。本地完成开发并不代表线上已经发布；是否上线以 GitHub Actions 的部署结果为准。
 
@@ -83,6 +83,67 @@ demo: false
 - 中文界面、响应式排版、明暗主题及偏好保存。
 - Markdown / MDX、分类标签、按时间归档、分页。
 - 按需加载的静态全文搜索（中文原词匹配，支持多关键词）、RSS、sitemap、SEO 元数据。
-- 本站无需数据库或后台服务。首版未接入评论或访问统计。
+- 本站无需自建数据库或服务器。评论存储于本仓库的 GitHub Issues，读者通过 GitHub 留言，博客按需显示；未接入访问统计。
 
 模板来源：[satnaing/astro-paper](https://github.com/satnaing/astro-paper)，初始提交 35cfa7fbe0b897306d27670d3819e55d5205f3dd。代码许可证见 LICENSE；正文的授权可由作者自行另行指定。
+
+## 个人思考
+
+```bash
+pnpm new-thought a-question-worth-keeping
+```
+
+草稿会写入 `src/content/posts/thoughts/`，自动包含 `kind: thought` 和 `category: 个人思考`。写完后设置 `draft: false` 并推送。思考单独展示在 `/thoughts/`，同时进入搜索、标签、归档和 RSS。现有一篇示例，发布自己的内容时替换正文并设置 `demo: false`。
+
+## 上传与发布 PDF
+
+最方便的方式：打开博客「资料」→「上传 PDF（作者入口）」→ 登录 GitHub → 选择文件 → Commit changes。文件进入 `public/documents/` 后，资料库会自动收录，并生成阅读页、下载链接与评论区。等待 Actions 成功即可查看。
+
+- GitHub 网页上传每个文件上限 25 MB，建议压缩后再发布。
+- 文件可以单独上传，无需写文章。建议使用 `diffusion-reading-notes.pdf` 这样的文件名。
+- 访问权限由 GitHub 控制，只有仓库有写入权限的人能上传；读者可以阅读、下载和评论。
+- 资料上传到公开仓库后即为公开文件。`draft` 只能隐藏入口，不能使 PDF 私密。
+- 浏览器原生支持 PDF 时可在页面内阅读；手机浏览器可选择「在新窗口打开」。
+
+也可以本地导入：
+
+```bash
+pnpm add-pdf "/完整路径/你的文档.pdf" diffusion-reading-notes "扩散语言模型阅读笔记"
+git add public/documents/
+git commit -m "docs: publish reading notes PDF"
+git push origin main
+```
+
+此命令会复制 PDF 并创建同名 JSON。可编辑 JSON 补充资料信息（手动上传 PDF 时也可另外创建）：
+
+```json
+{
+  "title": "扩散语言模型阅读笔记",
+  "description": "这份资料主要记录了什么。",
+  "date": "2026-10-22",
+  "tags": ["扩散模型", "论文阅读"],
+  "demo": false,
+  "draft": false
+}
+```
+
+例如 `public/documents/diffusion-reading-notes.pdf` 对应同目录的 `diffusion-reading-notes.json`，阅读页为 `/library/diffusion-reading-notes/`。省略 JSON 时，默认使用文件名作为标题。搜索会收录 PDF 的标题、简介和标签，不解析 PDF 全文。`publishing-guide.pdf` 是功能示例，可以删除 PDF 与同名 JSON（同时移除示例文章里的对应附件）。
+
+文章或思考也可挂 PDF 附件，在 Markdown 顶部加入：
+
+```yaml
+attachments:
+  - title: 扩散语言模型阅读笔记
+    file: /documents/diffusion-reading-notes.pdf
+```
+
+## 读者评论与管理
+
+每篇已发布文章、个人思考与 PDF 页面底部都有独立评论区。读者点击「在 GitHub 评论」→ 登录 GitHub → 在关联 Issue 留言 → 返回博客刷新，便会显示评论。博客以纯文本安全显示留言；完整 Markdown 格式、回复与表情可在 GitHub 中阅读。无需安装第三方 GitHub App。
+
+每次发布时，工作流自动为新内容创建评论 Issue，并生成 `comment-threads.json` 映射；正文的标题更改不会丢失已有评论。工作流仅额外使用 `issues: write`，自动令牌不会进入网页源码。不要删除评论 Issue 正文开头的 `lily-blog` 标记。
+
+- 管理评论：仓库 → Issues → 对应的 `[博客评论]`，可删除不合适的留言或锁定讨论。
+- 对某篇文章或思考关闭评论入口：frontmatter 添加 `comments: false`。
+- 评论按需加载，每页 20 条。GitHub 网络不可达或公共 API 限流时，页面显示重试按钮，并保留 GitHub 直达入口。
+- 单纯本地 `pnpm build` 不会创建线上 Issue；评论映射在 GitHub Actions 中自动生成。本地预览时出现无法读取评论提示属预期；线上可正常加载。

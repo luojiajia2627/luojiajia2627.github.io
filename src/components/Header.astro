@@ -10,8 +10,8 @@ const locale = Astro.currentLocale ?? config.site.lang;
 const url = (path: string) => getRelativeLocaleUrl(locale, path);
 const links = [
   { path: "posts", name: "文章" },
-  { path: "categories", name: "分类" },
-  { path: "tags", name: "标签" },
+  { path: "thoughts", name: "思考" },
+  { path: "library", name: "资料" },
   { path: "archives", name: "归档" },
   { path: "about", name: "关于" },
 ];
@@ -20,8 +20,10 @@ const links = [
 <a id="skip-to-content" class="skip-link" href="#main-content">跳转到正文</a>
 <header class="app-layout site-header">
   <a href={url("")} class="wordmark" aria-label="罗佳佳 Lily · 首页"
-    ><span class="monogram" aria-hidden="true">L.</span><span
-      >罗佳佳 <span class="wordmark-lily">Lily</span></span
+    ><span class="monogram" aria-hidden="true">L<span>↗</span></span><span
+      >罗佳佳 <span class="wordmark-lily"
+        >Lily<small>PERSONAL LAB / 个人实验室</small></span
+      ></span
     ></a
   >
   <div class="header-right">
@@ -94,8 +96,9 @@ const links = [
     align-items: center;
     justify-content: space-between;
     gap: 20px;
-    min-height: 100px;
+    min-height: 106px;
     position: relative;
+    border-bottom: 1px solid var(--border);
   }
   .wordmark {
     display: inline-flex;
@@ -108,13 +111,28 @@ const links = [
   .monogram {
     display: grid;
     place-items: center;
-    width: 30px;
-    height: 32px;
-    border: 1px solid var(--border);
-    border-radius: 7px;
-    font-family: Georgia, serif;
-    font-size: 21px;
-    color: var(--accent);
+    width: 39px;
+    height: 42px;
+    border: 1px solid var(--accent);
+    font-family: var(--font-mono);
+    font-size: 27px;
+    color: var(--accent-foreground);
+    background: var(--accent);
+    position: relative;
+    line-height: 1;
+    padding-right: 6px;
+  }
+  .monogram > span {
+    font-size: 13px;
+    position: absolute;
+    right: 4px;
+    top: 5px;
+  }
+  .wordmark-lily small {
+    display: block;
+    font: 8px var(--font-mono);
+    letter-spacing: 0.07em;
+    margin-top: 3px;
   }
   .wordmark-lily {
     margin-left: 3px;
@@ -150,7 +168,7 @@ const links = [
     place-items: center;
     height: 34px;
     width: 34px;
-    border-radius: 6px;
+    border-radius: 2px;
     color: var(--muted-foreground);
   }
   .icon-button:hover {
@@ -193,6 +211,22 @@ const links = [
   @media (max-width: 700px) {
     .site-header {
       min-height: 82px;
+      gap: 8px;
+    }
+    .wordmark {
+      gap: 8px;
+      font-size: 14px;
+    }
+    .monogram {
+      width: 34px;
+      height: 38px;
+      font-size: 25px;
+    }
+    .wordmark-lily small {
+      font-size: 6.5px;
+    }
+    .icon-button {
+      width: 30px;
     }
     .header-tools {
       margin: 0;

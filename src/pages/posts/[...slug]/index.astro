@@ -4,6 +4,8 @@ import { getRelativeLocaleUrl } from "astro:i18n";
 import PostLayout from "@/layouts/PostLayout.astro";
 import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
+import Comments from "@/components/Comments.astro";
+import { getDocuments } from "@/utils/getDocuments";
 import Datetime from "@/components/Datetime.astro";
 import Tag from "@/components/Tag.astro";
 import { getPostSlug } from "@/utils/getPostPaths";
@@ -38,9 +40,30 @@ type Props = {
   nextPost: Adjacent;
 };
 const { post, prevPost, nextPost } = Astro.props;
-const { title, description, pubDatetime, modDatetime, tags, category, demo } =
-  post.data;
+const {
+  title,
+  description,
+  pubDatetime,
+  modDatetime,
+  tags,
+  category,
+  demo,
+  kind,
+  comments,
+  attachments,
+} = post.data;
 const { Content, headings } = await render(post);
+const documents = attachments.length ? await getDocuments() : [];
+for (const attachment of attachments) {
+  if (
+    !documents.some(
+      doc =>
+        decodeURIComponent(doc.file) === decodeURIComponent(attachment.file)
+    )
+  ) {
+    throw new Error(`${post.id} 的 PDF 附件不存在或已隐藏：${attachment.file}`);
+  }
+}
 const toc = headings.filter(
   heading => heading.depth === 2 || heading.depth === 3
 );
@@ -62,7 +85,10 @@ const categoryUrl = getRelativeLocaleUrl(
   <main id="main-content" class="app-layout article-page">
     <a
       class="article-back quiet-link"
-      href={getRelativeLocaleUrl(config.site.lang, "posts")}>← 所有文章</a
+      href={getRelativeLocaleUrl(
+        config.site.lang,
+        kind === "thought" ? "thoughts" : "posts"
+      )}>← {kind === "thought" ? "个人思考" : "所有文章"}</a
     >
     <header class="article-heading">
       <a class="article-category" href={categoryUrl}>{category}</a>
@@ -104,12 +130,38 @@ const categoryUrl = getRelativeLocaleUrl(
     >
       <Content />
     </article>
+    {
+      attachments.length > 0 && (
+        <aside class="article-attachments">
+          <p class="eyebrow">READING MATERIALS / 附件</p>
+          {attachments.map(attachment => (
+            <a
+              href={
+                "/library/" +
+                encodeURIComponent(
+                  decodeURIComponent(attachment.file.split("/").pop()!).replace(
+                    /\.pdf$/i,
+                    ""
+                  )
+                ) +
+                "/"
+              }
+            >
+              <span>PDF ↗</span>
+              <strong>{attachment.title}</strong>
+              <span>阅读与下载 →</span>
+            </a>
+          ))}
+        </aside>
+      )
+    }
     <div class="article-bottom">
       <ul class="flex flex-wrap gap-4">
         {tags.map(tag => <Tag tag={slugifyStr(tag)} tagName={tag} size="sm" />)}
       </ul><a href="#main-content" class="quiet-link">回到顶部 ↑</a>
     </div>
     <div><AdjacentPostNav {prevPost} {nextPost} /></div>
+    {comments && <Comments />}
   </main>
   <Footer />
 </PostLayout>
@@ -143,6 +195,27 @@ const categoryUrl = getRelativeLocaleUrl(
   document.addEventListener("astro:page-load", setupArticle);
 </script>
 <style>
+  .article-attachments {
+    margin-top: 32px;
+    border: 1px solid var(--border);
+    padding: 20px;
+    background: var(--surface);
+  }
+  .article-attachments a {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding-top: 15px;
+    font-size: 12px;
+  }
+  .article-attachments a > span {
+    color: var(--accent);
+    font-size: 10px;
+  }
+  .article-attachments a > span:last-child {
+    margin-left: auto;
+    white-space: nowrap;
+  }
   .article-page {
     padding-top: 36px;
   }

@@ -11,7 +11,10 @@ import config from "@/config";
 
 <Layout title={"搜索 | " + config.site.title}>
   <Header /><Breadcrumb />
-  <Main pageTitle="搜索" pageDesc="输入关键词，搜索文章标题、标签与正文。">
+  <Main
+    pageTitle="搜索"
+    pageDesc="搜索技术文章、个人思考，以及 PDF 的标题、简介和标签。"
+  >
     <div id="blog-search" data-index-url={getAssetPath("search-index.json")}>
       <form role="search" class="search-form">
         <label for="search-input" class="sr-only">搜索文章</label><IconSearch
@@ -20,7 +23,7 @@ import config from "@/config";
         <input
           id="search-input"
           type="search"
-          placeholder="搜索文章标题或正文…"
+          placeholder="搜索文章、思考或 PDF 资料…"
           autocomplete="off"
           maxlength="120"
           aria-describedby="search-status"
@@ -110,19 +113,21 @@ import config from "@/config";
         if (current !== generation || !root.isConnected) return;
         const matches = searchPosts(posts, query);
         status.textContent = matches.length
-          ? "找到 " + matches.length + " 篇相关文章"
-          : "没有找到相关文章，换一个关键词试试。";
+          ? "找到 " + matches.length + " 条相关内容"
+          : "没有找到相关内容，换一个关键词试试。";
         for (const post of matches) {
           const item = document.createElement("li");
           const meta = document.createElement("p");
           meta.className = "search-result-meta";
           meta.textContent =
             post.category +
-            " · " +
-            new Intl.DateTimeFormat("zh-CN", {
-              timeZone: "Asia/Shanghai",
-            }).format(new Date(post.date)) +
-            (post.demo ? " · 示例文章" : "");
+            (post.date
+              ? " · " +
+                new Intl.DateTimeFormat("zh-CN", {
+                  timeZone: "Asia/Shanghai",
+                }).format(new Date(post.date))
+              : "") +
+            (post.demo ? " · 功能示例" : "");
           const heading = document.createElement("h2");
           const link = document.createElement("a");
           link.href = post.url;

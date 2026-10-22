@@ -3,6 +3,7 @@ import { getSortedPosts } from "@/utils/getSortedPosts";
 import { getPostUrl } from "@/utils/getPostPaths";
 import type { SearchPost } from "@/types/search";
 import config from "@/config";
+import { getDocuments } from "@/utils/getDocuments";
 
 export async function GET() {
   const posts = getSortedPosts(await getCollection("posts"));
@@ -23,6 +24,17 @@ export async function GET() {
       .replace(/\s+/g, " ")
       .trim(),
   }));
+  for (const doc of await getDocuments())
+    index.push({
+      title: doc.title,
+      description: doc.description,
+      content: doc.description,
+      category: "PDF 资料",
+      tags: doc.tags,
+      date: doc.date ? new Date(doc.date).toISOString() : "",
+      demo: doc.demo,
+      url: doc.url,
+    });
   return new Response(JSON.stringify(index), {
     headers: { "Content-Type": "application/json; charset=utf-8" },
   });

@@ -23,7 +23,7 @@
 }
 
 @utility max-w-app {
-  max-width: 880px;
+  max-width: 1080px;
 }
 
 @utility app-layout {
@@ -42,6 +42,12 @@ body {
   font-size: 15px;
   line-height: 1.8;
   -webkit-font-smoothing: antialiased;
+  background-image: linear-gradient(
+    90deg,
+    var(--grid-line) 1px,
+    transparent 1px
+  );
+  background-size: 80px 100%;
 }
 button,
 a {
@@ -63,6 +69,101 @@ a {
 .app-prose {
   font-size: 16px;
   line-height: 2;
+}
+.article-page {
+  max-width: 850px;
+}
+.lab-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 9px 15px;
+  font-size: 12px;
+  background: var(--accent);
+  color: var(--accent-foreground);
+  border: 1px solid var(--accent);
+  transition: opacity 0.2s;
+}
+.lab-button:hover {
+  opacity: 0.85;
+}
+.collection-page {
+  padding-top: 42px;
+}
+.page-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 30px;
+  padding: 25px 0 42px;
+}
+.page-heading h1 {
+  font-size: clamp(27px, 4vw, 39px);
+  line-height: 1.6;
+  font-weight: 550;
+  letter-spacing: -0.04em;
+  margin: 13px 0 14px;
+}
+.page-heading h1 span {
+  color: var(--accent);
+}
+.page-heading p:not(.eyebrow) {
+  color: var(--muted-foreground);
+  font-size: 13px;
+  line-height: 1.9;
+}
+.collection-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  padding: 15px 0;
+  font-size: 11px;
+  color: var(--muted-foreground);
+}
+.owner-label {
+  font-size: 9px;
+  border: 1px solid var(--border);
+  padding: 2px 4px;
+  margin-left: 4px;
+}
+.library-note {
+  display: flex;
+  gap: 15px;
+  border-top: 1px dashed var(--border);
+  padding-top: 25px;
+  margin-top: 45px;
+  color: var(--muted-foreground);
+  font-size: 12px;
+}
+.library-note > span {
+  color: var(--accent);
+  font-size: 22px;
+  line-height: 1.2;
+}
+.library-note a {
+  color: var(--accent);
+  margin: 0 4px;
+}
+.empty-state {
+  padding: 60px 20px;
+  text-align: center;
+  color: var(--muted-foreground);
+}
+.empty-state > span {
+  font: 40px var(--font-mono);
+  color: var(--accent);
+}
+.empty-state h2 {
+  margin: 20px 0 10px;
+  color: var(--foreground);
+  font-size: 22px;
+}
+.empty-state p {
+  font-size: 13px;
 }
 .app-prose h2 {
   margin-top: 2.2em;

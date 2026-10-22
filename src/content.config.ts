@@ -15,6 +15,21 @@ const posts = defineCollection({
       title: z.string(),
       featured: z.boolean().optional(),
       category: z.string().default("未分类"),
+      kind: z.enum(["article", "thought"]).default("article"),
+      comments: z.boolean().default(true),
+      attachments: z
+        .array(
+          z.object({
+            title: z.string(),
+            file: z
+              .string()
+              .regex(
+                /^\/documents\/[^?#]+\.pdf$/i,
+                "PDF 附件应放在 public/documents/ 下"
+              ),
+          })
+        )
+        .default([]),
       demo: z.boolean().default(false),
       draft: z.boolean().optional(),
       tags: z.array(z.string()).default(["others"]),
