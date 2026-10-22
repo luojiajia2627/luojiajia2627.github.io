@@ -3,6 +3,7 @@ import Layout from "@/layouts/Layout.astro";
 import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
 import Comments from "@/components/Comments.astro";
+import PdfReader from "@/components/PdfReader.astro";
 import { getDocuments, type BlogDocument } from "@/utils/getDocuments";
 export async function getStaticPaths() {
   return (await getDocuments()).map(doc => ({
@@ -33,26 +34,13 @@ const { doc } = Astro.props as { doc: BlogDocument };
         <a href={doc.file} target="_blank" rel="noopener noreferrer"
           >在新窗口打开 ↗</a
         ><a class="lab-button" href={doc.file} download={doc.filename}
-          >下载 PDF ↓</a>
+          >下载 PDF ↓</a
+        >
       </div>
     </div>
-    <object
-      class="pdf-reader"
-      data={doc.file + "#view=FitH"}
-      type="application/pdf"
-      aria-label={doc.title + " PDF 文档"}
-      ><div class="pdf-fallback">
-        <h2>在浏览器中打开这份文档</h2><p>
-          当前浏览器无法内嵌 PDF，可以用新窗口阅读，或下载到本地。
-        </p><a
-          class="lab-button"
-          href={doc.file}
-          target="_blank"
-          rel="noopener noreferrer">打开 PDF ↗</a>
-      </div></object
-    >
+    <PdfReader file={doc.file} title={doc.title} />
     <p class="pdf-reader-note">
-      手机浏览器若未显示全部页面，请选择「在新窗口打开」。
+      支持翻页、缩放和文字提取；也可以在新窗口打开原始 PDF。
     </p>
     <Comments title="读完之后，聊聊看" />
   </main><Footer />
@@ -98,27 +86,6 @@ const { doc } = Astro.props as { doc: BlogDocument };
     gap: 18px;
     align-items: center;
   }
-  .pdf-reader {
-    display: block;
-    width: 100%;
-    height: min(80vh, 920px);
-    min-height: 480px;
-    border: 1px solid var(--border);
-    border-top: 0;
-    background: var(--muted);
-  }
-  .pdf-fallback {
-    padding: 45px 24px;
-    text-align: center;
-  }
-  .pdf-fallback h2 {
-    font-size: 20px;
-  }
-  .pdf-fallback p {
-    font-size: 13px;
-    color: var(--muted-foreground);
-    margin: 16px 0 24px;
-  }
   .pdf-reader-note {
     font-size: 10px;
     color: var(--muted-foreground);
@@ -128,10 +95,6 @@ const { doc } = Astro.props as { doc: BlogDocument };
     .pdf-toolbar {
       flex-direction: column;
       align-items: flex-start;
-    }
-    .pdf-reader {
-      min-height: 430px;
-      height: 65vh;
     }
   }
 </style>

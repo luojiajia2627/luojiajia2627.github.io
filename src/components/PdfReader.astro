@@ -1,0 +1,293 @@
+---
+type Props = { file: string; title: string };
+const { file, title } = Astro.props;
+---
+
+<section
+  class="pdf-reader"
+  data-pdf-reader
+  data-file={file}
+  data-title={title}
+  aria-label={title + " 阅读器"}
+>
+  <div class="reader-controls" aria-label="PDF 阅读控制">
+    <div>
+      <button data-prev type="button" disabled aria-label="上一页">←</button
+      ><span><span data-page>1</span> / <span data-total>—</span></span><button
+        data-next
+        type="button"
+        disabled
+        aria-label="下一页">→</button>
+    </div><div>
+      <button data-zoom-out type="button" disabled aria-label="缩小文档"
+        >−</button
+      ><output data-zoom>适合宽度</output><button
+        data-zoom-in
+        type="button"
+        disabled
+        aria-label="放大文档">＋</button
+      ><button data-fit type="button" disabled>适宽</button>
+    </div>
+  </div>
+  <p data-reader-status class="reader-status" role="status">正在准备阅读器…</p>
+  <div
+    class="canvas-scroll"
+    tabindex="0"
+    aria-label="PDF 页面，可横向滚动查看放大的文档"
+  >
+    <canvas data-pdf-canvas role="img" aria-label={title + " PDF 页面"} hidden
+    ></canvas>
+  </div>
+  <details class="reader-text">
+    <summary>本页文字 · 复制与辅助阅读</summary><p data-pdf-text>
+      正在提取本页文字…
+    </p>
+  </details>
+  <noscript
+    ><p class="reader-status">
+      请开启 JavaScript，或使用上方的新窗口和下载链接阅读 PDF。
+    </p></noscript
+  >
+</section>
+<script>
+  import type { PDFDocumentProxy, RenderTask } from "pdfjs-dist";
+  import workerUrl from "pdfjs-dist/build/pdf.worker.min.mjs?url";
+  function setupPdfReader() {
+    const root = document.querySelector<HTMLElement>("[data-pdf-reader]");
+    if (!root || root.dataset.ready) return;
+    root.dataset.ready = "true";
+    const canvas = root.querySelector<HTMLCanvasElement>("canvas")!;
+    const scroller = root.querySelector<HTMLElement>(".canvas-scroll")!;
+    const status = root.querySelector<HTMLElement>("[data-reader-status]")!;
+    const prev = root.querySelector<HTMLButtonElement>("[data-prev]")!;
+    const next = root.querySelector<HTMLButtonElement>("[data-next]")!;
+    const zoomIn = root.querySelector<HTMLButtonElement>("[data-zoom-in]")!;
+    const zoomOut = root.querySelector<HTMLButtonElement>("[data-zoom-out]")!;
+    const fit = root.querySelector<HTMLButtonElement>("[data-fit]")!;
+    let pdf: PDFDocumentProxy | undefined;
+    let renderTask: RenderTask | undefined;
+    let current = 1;
+    let zoom = 1;
+    let generation = 0;
+    let disposed = false;
+    async function draw() {
+      if (!pdf || disposed) return;
+      const version = ++generation;
+      renderTask?.cancel();
+      prev.disabled = current <= 1;
+      next.disabled = current >= pdf.numPages;
+      zoomOut.disabled = zoom <= 0.75;
+      zoomIn.disabled = zoom >= 2;
+      fit.disabled = zoom === 1;
+      root!.querySelector("[data-page]")!.textContent = String(current);
+      status.textContent = "正在渲染第 " + current + " 页…";
+      try {
+        const page = await pdf.getPage(current);
+        if (version !== generation || disposed) return;
+        const base = page.getViewport({ scale: 1 });
+        const available = Math.max(180, scroller.clientWidth - 32);
+        const scale = Math.min(1.6, available / base.width) * zoom;
+        const viewport = page.getViewport({ scale });
+        const ratio = Math.min(window.devicePixelRatio || 1, 2);
+        canvas.width = Math.floor(viewport.width * ratio);
+        canvas.height = Math.floor(viewport.height * ratio);
+        canvas.style.width = viewport.width + "px";
+        canvas.style.height = viewport.height + "px";
+        canvas.hidden = false;
+        canvas.setAttribute(
+          "aria-label",
+          `${root!.dataset.title}，第 ${current} 页，共 ${pdf.numPages} 页`
+        );
+        renderTask = page.render({
+          canvas,
+          canvasContext: canvas.getContext("2d")!,
+          viewport,
+          transform: ratio !== 1 ? [ratio, 0, 0, ratio, 0, 0] : undefined,
+        });
+        await renderTask.promise;
+        if (version !== generation || disposed) return;
+        status.textContent = "";
+        root!.querySelector("[data-zoom]")!.textContent =
+          zoom === 1 ? "适合宽度" : Math.round(zoom * 100) + "%";
+        const content = await page.getTextContent();
+        if (version !== generation || disposed) return;
+        root!.querySelector("[data-pdf-text]")!.textContent =
+          content.items
+            .map(item =>
+              "str" in item ? item.str + (item.hasEOL ? "\n" : " ") : ""
+            )
+            .join("") || "本页可能是扫描图像，没有可提取的文字。";
+      } catch (error) {
+        if (
+          (error as Error).name !== "RenderingCancelledException" &&
+          version === generation &&
+          !disposed
+        )
+          status.textContent =
+            "这页暂时无法显示，可以在新窗口打开或下载 PDF 阅读。";
+      }
+    }
+    prev.addEventListener("click", () => {
+      if (current > 1) {
+        current--;
+        void draw();
+      }
+    });
+    next.addEventListener("click", () => {
+      if (pdf && current < pdf.numPages) {
+        current++;
+        void draw();
+      }
+    });
+    zoomIn.addEventListener("click", () => {
+      zoom = Math.min(2, zoom + 0.25);
+      void draw();
+    });
+    zoomOut.addEventListener("click", () => {
+      zoom = Math.max(0.75, zoom - 0.25);
+      void draw();
+    });
+    fit.addEventListener("click", () => {
+      zoom = 1;
+      void draw();
+    });
+    let resizeTimer: ReturnType<typeof setTimeout>;
+    const resize = new ResizeObserver(() => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => void draw(), 150);
+    });
+    resize.observe(scroller);
+    void (async () => {
+      try {
+        const { getDocument, GlobalWorkerOptions } = await import("pdfjs-dist");
+        GlobalWorkerOptions.workerSrc = workerUrl;
+        const loading = getDocument({
+          url: root.dataset.file!,
+          cMapUrl: "/pdfjs/cmaps/",
+          cMapPacked: true,
+          standardFontDataUrl: "/pdfjs/standard_fonts/",
+          wasmUrl: "/pdfjs/wasm/",
+        });
+        document.addEventListener(
+          "astro:before-swap",
+          () => {
+            disposed = true;
+            generation++;
+            resize.disconnect();
+            clearTimeout(resizeTimer);
+            renderTask?.cancel();
+            void loading.destroy();
+          },
+          { once: true }
+        );
+        pdf = await loading.promise;
+        if (disposed) return;
+        root.querySelector("[data-total]")!.textContent = String(pdf.numPages);
+        await draw();
+      } catch (error) {
+        if (!disposed)
+          status.textContent =
+            (error as Error).name === "PasswordException"
+              ? "这份 PDF 需要密码，请在新窗口打开。"
+              : "PDF 暂时无法加载，请使用新窗口或下载链接阅读。";
+      }
+    })();
+  }
+  document.addEventListener("astro:page-load", setupPdfReader);
+</script>
+<style>
+  .pdf-reader {
+    border: 1px solid var(--border);
+    border-top: 0;
+    background: var(--muted);
+  }
+  .reader-controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    font: 11px var(--font-mono);
+    flex-wrap: wrap;
+  }
+  .reader-controls > div {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  button {
+    width: 28px;
+    height: 28px;
+    border: 1px solid var(--border);
+    color: var(--accent);
+    background: var(--background);
+  }
+  button:disabled {
+    opacity: 0.35;
+    cursor: default;
+  }
+  button[data-fit] {
+    font: 10px var(--font-app);
+    width: 38px;
+  }
+  output {
+    font: 10px var(--font-app);
+    min-width: 50px;
+    text-align: center;
+  }
+  .reader-status:not(:empty) {
+    font-size: 12px;
+    text-align: center;
+    padding: 24px 18px;
+    color: var(--muted-foreground);
+  }
+  .canvas-scroll {
+    overflow: auto;
+    max-height: 85vh;
+    padding: 16px;
+    overscroll-behavior: contain;
+  }
+  canvas {
+    display: block;
+    background: white;
+    margin: 0 auto;
+    box-shadow: 0 3px 12px #00000012;
+  }
+  canvas[hidden] {
+    display: none;
+  }
+  .reader-text {
+    background: var(--surface);
+    font-size: 11px;
+    border-top: 1px solid var(--border);
+    padding: 12px 16px;
+  }
+  summary {
+    cursor: pointer;
+    color: var(--muted-foreground);
+  }
+  .reader-text p {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    line-height: 1.9;
+    padding-top: 15px;
+    font-size: 13px;
+  }
+  @media (max-width: 520px) {
+    .reader-controls {
+      padding: 8px;
+      gap: 8px;
+    }
+    .reader-controls > div {
+      gap: 7px;
+    }
+    button {
+      width: 25px;
+    }
+    .canvas-scroll {
+      padding: 10px;
+    }
+  }
+</style>
