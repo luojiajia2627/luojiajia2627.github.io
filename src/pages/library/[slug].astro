@@ -47,7 +47,7 @@ const { doc } = Astro.props as { doc: BlogDocument };
 </Layout>
 <style>
   .back-link {
-    font-size: 12px;
+    font-size: 14px;
   }
   .pdf-heading {
     margin: 30px 0;
@@ -61,14 +61,14 @@ const { doc } = Astro.props as { doc: BlogDocument };
   }
   .pdf-heading > p:not(.eyebrow) {
     color: var(--muted-foreground);
-    font-size: 14px;
+    font-size: 16px;
   }
   .pdf-meta {
     display: flex;
     flex-wrap: wrap;
     gap: 14px;
     margin-top: 20px;
-    font-size: 11px;
+    font-size: 12px;
     color: var(--muted-foreground);
   }
   .pdf-toolbar {
@@ -77,7 +77,7 @@ const { doc } = Astro.props as { doc: BlogDocument };
     justify-content: space-between;
     border: 1px solid var(--border);
     padding: 13px 16px;
-    font-size: 11px;
+    font-size: 12px;
     background: var(--surface);
     gap: 16px;
   }
@@ -87,7 +87,7 @@ const { doc } = Astro.props as { doc: BlogDocument };
     align-items: center;
   }
   .pdf-reader-note {
-    font-size: 10px;
+    font-size: 11px;
     color: var(--muted-foreground);
     margin-top: 10px;
   }

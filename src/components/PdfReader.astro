@@ -17,7 +17,8 @@ const { file, title } = Astro.props;
         data-next
         type="button"
         disabled
-        aria-label="下一页">→</button>
+        aria-label="下一页">→</button
+      >
     </div><div>
       <button data-zoom-out type="button" disabled aria-label="缩小文档"
         >−</button
@@ -209,7 +210,7 @@ const { file, title } = Astro.props;
     padding: 10px 16px;
     border-bottom: 1px solid var(--border);
     background: var(--surface);
-    font: 11px var(--font-mono);
+    font: 12px var(--font-mono);
     flex-wrap: wrap;
   }
   .reader-controls > div {
@@ -229,16 +230,16 @@ const { file, title } = Astro.props;
     cursor: default;
   }
   button[data-fit] {
-    font: 10px var(--font-app);
+    font: 11px var(--font-app);
     width: 38px;
   }
   output {
-    font: 10px var(--font-app);
+    font: 11px var(--font-app);
     min-width: 50px;
     text-align: center;
   }
   .reader-status:not(:empty) {
-    font-size: 12px;
+    font-size: 14px;
     text-align: center;
     padding: 24px 18px;
     color: var(--muted-foreground);
@@ -260,7 +261,7 @@ const { file, title } = Astro.props;
   }
   .reader-text {
     background: var(--surface);
-    font-size: 11px;
+    font-size: 12px;
     border-top: 1px solid var(--border);
     padding: 12px 16px;
   }
@@ -273,7 +274,7 @@ const { file, title } = Astro.props;
     overflow-wrap: anywhere;
     line-height: 1.9;
     padding-top: 15px;
-    font-size: 13px;
+    font-size: 15px;
   }
   @media (max-width: 520px) {
     .reader-controls {

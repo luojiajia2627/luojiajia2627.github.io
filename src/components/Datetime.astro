@@ -45,13 +45,13 @@ const date = datetime.format("YYYY.MM.DD");
   />
   {
     isModified && (
-      <span class:list={["text-sm", { "sm:text-base": size === "lg" }]}>
+      <span class:list={["text-[15px]", { "sm:text-base": size === "lg" }]}>
         {t.post.updatedAt}:
       </span>
     )
   }
   <time
-    class:list={["text-sm", { "sm:text-base": size === "lg" }]}
+    class:list={["text-[15px]", { "sm:text-base": size === "lg" }]}
     datetime={datetime.toISOString()}
   >
     {date}

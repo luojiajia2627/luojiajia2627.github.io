@@ -39,7 +39,7 @@
 }
 
 body {
-  font-size: 15px;
+  font-size: 16px;
   line-height: 1.8;
   -webkit-font-smoothing: antialiased;
 }
@@ -49,7 +49,7 @@ a {
 }
 .eyebrow {
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 11px;
+  font-size: 12px;
   letter-spacing: 0.15em;
   color: var(--muted-foreground);
 }
@@ -61,7 +61,7 @@ a {
   color: var(--accent);
 }
 .app-prose {
-  font-size: 16px;
+  font-size: 17px;
   line-height: 2;
 }
 .article-page {
@@ -73,7 +73,7 @@ a {
   justify-content: center;
   gap: 8px;
   padding: 9px 15px;
-  font-size: 12px;
+  font-size: 14px;
   background: transparent;
   color: var(--accent);
   border: 1px solid var(--border);
@@ -106,7 +106,7 @@ a {
 }
 .page-heading p:not(.eyebrow) {
   color: var(--muted-foreground);
-  font-size: 13px;
+  font-size: 15px;
   line-height: 1.9;
 }
 .collection-toolbar {
@@ -117,11 +117,11 @@ a {
   border-top: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
   padding: 15px 0;
-  font-size: 11px;
+  font-size: 12px;
   color: var(--muted-foreground);
 }
 .owner-label {
-  font-size: 9px;
+  font-size: 10px;
   border: 1px solid var(--border);
   padding: 2px 4px;
   margin-left: 4px;
@@ -133,11 +133,11 @@ a {
   padding-top: 25px;
   margin-top: 45px;
   color: var(--muted-foreground);
-  font-size: 12px;
+  font-size: 14px;
 }
 .library-note > span {
   color: var(--accent);
-  font-size: 22px;
+  font-size: 23px;
   line-height: 1.2;
 }
 .library-note a {
@@ -156,10 +156,10 @@ a {
 .empty-state h2 {
   margin: 20px 0 10px;
   color: var(--foreground);
-  font-size: 22px;
+  font-size: 23px;
 }
 .empty-state p {
-  font-size: 13px;
+  font-size: 15px;
 }
 .app-prose h2 {
   margin-top: 2.2em;
