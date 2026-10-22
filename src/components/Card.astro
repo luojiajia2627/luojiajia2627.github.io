@@ -1,0 +1,145 @@
+---
+import type { CollectionEntry } from "astro:content";
+import { getPostUrl } from "@/utils/getPostPaths";
+import { slugifyStr } from "@/utils/slugify";
+import { getRelativeLocaleUrl } from "astro:i18n";
+import config from "@/config";
+type Props = { variant?: "h2" | "h3" } & CollectionEntry<"posts">;
+const { variant: Heading = "h2", id, data, filePath } = Astro.props;
+const locale = Astro.currentLocale ?? config.site.lang;
+const date = new Intl.DateTimeFormat("zh-CN", {
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+  timeZone: "Asia/Shanghai",
+})
+  .format(data.pubDatetime)
+  .replaceAll("/", ".");
+---
+
+<li class="post-row">
+  <div class="post-meta">
+    <time datetime={data.pubDatetime.toISOString()}>{date}</time><a
+      href={getRelativeLocaleUrl(
+        locale,
+        "categories/" + slugifyStr(data.category)
+      )}>{data.category}</a>
+  </div>
+  <div class="post-info">
+    <a href={getPostUrl(id, filePath, locale)} class="post-title"
+      ><Heading>{data.title}</Heading><span
+        aria-hidden="true"
+        class="post-arrow">↗</span
+      ></a
+    >
+    <p class="post-description">{data.description}</p>
+    <div class="post-tags">
+      {data.demo && <span class="demo-label">示例文章</span>}{
+        data.tags
+          .slice(0, 3)
+          .map(tag => (
+            <a href={getRelativeLocaleUrl(locale, "tags/" + slugifyStr(tag))}>
+              #{tag}
+            </a>
+          ))
+      }
+    </div>
+  </div>
+</li>
+<style>
+  .post-row {
+    display: grid;
+    grid-template-columns: 104px minmax(0, 1fr);
+    gap: 26px;
+    border-bottom: 1px solid var(--border);
+    padding: 30px 0;
+  }
+  .post-meta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    padding-top: 4px;
+    font-size: 11px;
+    color: var(--muted-foreground);
+  }
+  time {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 11px;
+    letter-spacing: 0.015em;
+  }
+  .post-meta a {
+    font-size: 11px;
+    color: var(--accent);
+  }
+  .post-title {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    line-height: 1.7;
+  }
+  .post-title :global(h2),
+  .post-title :global(h3) {
+    font-size: 19px;
+    font-weight: 550;
+    letter-spacing: -0.02em;
+  }
+  .post-title:hover {
+    color: var(--accent);
+  }
+  .post-arrow {
+    color: var(--muted-foreground);
+    font-size: 18px;
+    transition: transform 0.2s;
+  }
+  .post-title:hover .post-arrow {
+    transform: translate(2px, -2px);
+    color: var(--accent);
+  }
+  .post-description {
+    color: var(--muted-foreground);
+    font-size: 13px;
+    line-height: 1.9;
+    margin-top: 9px;
+    max-width: 95%;
+  }
+  .post-tags {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    font-size: 11px;
+    color: var(--muted-foreground);
+    margin-top: 13px;
+  }
+  .post-tags a:hover {
+    color: var(--accent);
+  }
+  .demo-label {
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 0 5px;
+    font-size: 10px;
+  }
+  @media (max-width: 550px) {
+    .post-row {
+      grid-template-columns: 1fr;
+      gap: 10px;
+      padding: 26px 0;
+    }
+    .post-meta {
+      flex-direction: row;
+      gap: 12px;
+      align-items: center;
+      padding: 0;
+    }
+    .post-title :global(h2),
+    .post-title :global(h3) {
+      font-size: 18px;
+    }
+    .post-description {
+      max-width: 100%;
+    }
+  }
+</style>

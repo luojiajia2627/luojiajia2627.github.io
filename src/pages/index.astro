@@ -1,0 +1,297 @@
+---
+import { getCollection } from "astro:content";
+import { getRelativeLocaleUrl } from "astro:i18n";
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import Card from "@/components/Card.astro";
+import { getSortedPosts } from "@/utils/getSortedPosts";
+import { slugifyStr } from "@/utils/slugify";
+import config from "@/config";
+import { getAssetPath } from "@/utils/withBase";
+const posts = getSortedPosts(await getCollection("posts"));
+const locale = Astro.currentLocale ?? config.site.lang;
+const url = (path: string) => getRelativeLocaleUrl(locale, path);
+const topics = [
+  { name: "扩散语言模型", en: "Diffusion Language Models", num: "01" },
+  { name: "推荐算法", en: "Recommender Systems", num: "02" },
+  { name: "前后端开发", en: "Web Development", num: "03" },
+];
+---
+
+<Layout>
+  <Header />
+  <main id="main-content" class="app-layout" data-home-path={url("")}>
+    <section class="hero">
+      <p class="eyebrow hero-eyebrow">
+        <span class="tiny-dot" aria-hidden="true"></span>LILY’S TECH NOTES
+      </p>
+      <h1>保持好奇，<br />把想法写成代码<span class="title-dot">。</span></h1>
+      <p class="hero-intro">
+        你好，我是<span class="intro-name">罗佳佳 Lily</span>。
+      </p>
+      <p class="hero-description">
+        在模型与应用之间探索。这里记录我对扩散语言模型、推荐算法<br
+          class="desktop-break"
+        />和前后端开发的学习、思考与实践。
+      </p>
+      <div class="hero-links">
+        <a href={url("about")}>更多关于我 <span aria-hidden="true">↗</span></a
+        ><span class="link-divider" aria-hidden="true">/</span><a
+          href="https://github.com/luojiajia2627"
+          target="_blank"
+          rel="noopener noreferrer">GitHub <span aria-hidden="true">↗</span></a
+        ><span class="link-divider" aria-hidden="true">/</span><a
+          href={getAssetPath("rss.xml")}
+          >订阅 RSS <span aria-hidden="true">↗</span></a>
+      </div>
+      <span class="hero-side-note" aria-hidden="true">LEARN. BUILD. SHARE.</span
+      >
+    </section>
+    <section class="topics" aria-label="技术方向">
+      {
+        topics.map(topic => (
+          <a href={url("categories/" + slugifyStr(topic.name))} class="topic">
+            <>
+              <span class="topic-num">{topic.num}</span>
+              <span>
+                <>
+                  <span class="topic-name">{topic.name}</span>
+                  <span class="topic-en">{topic.en}</span>
+                </>
+              </span>
+              <span class="topic-arrow" aria-hidden="true">
+                ↗
+              </span>
+            </>
+          </a>
+        ))
+      }
+    </section>
+    <section class="notes" aria-labelledby="notes-heading">
+      <div class="section-heading">
+        <h2 id="notes-heading">
+          最近的笔记 <span class="note-count"
+            >{String(posts.length).padStart(2, "0")}</span>
+        </h2><a href={url("posts")} class="quiet-link"
+          >全部文章 <span aria-hidden="true">→</span></a>
+      </div>
+      <ul>
+        {
+          posts
+            .slice(0, config.posts.perIndex)
+            .map(post => <Card variant="h3" {...post} />)
+        }
+      </ul>
+      {posts.length === 0 && <p class="empty-notes">第一篇笔记正在路上。</p>}
+      <div class="notes-end">
+        <span class="end-mark" aria-hidden="true">✳</span><p>
+          慢慢学习，认真记录。
+        </p><a href={url("archives")} class="quiet-link">翻阅文章归档 →</a>
+      </div>
+    </section>
+  </main>
+  <Footer />
+</Layout>
+<script>
+  document.addEventListener("astro:page-load", () => {
+    const main = document.querySelector<HTMLElement>("[data-home-path]");
+    if (main) sessionStorage.setItem("backUrl", main.dataset.homePath ?? "/");
+  });
+</script>
+<style>
+  .hero {
+    padding: 69px 0 49px;
+    position: relative;
+  }
+  .hero-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+  }
+  .tiny-dot {
+    width: 6px;
+    height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+  }
+  h1 {
+    font-size: clamp(36px, 5.2vw, 49px);
+    line-height: 1.52;
+    letter-spacing: -0.045em;
+    font-weight: 600;
+    margin: 21px 0 24px;
+  }
+  .title-dot {
+    color: var(--accent);
+  }
+  .hero-intro {
+    font-size: 14px;
+    color: var(--muted-foreground);
+  }
+  .intro-name {
+    color: var(--foreground);
+    margin: 0 4px;
+  }
+  .hero-description {
+    color: var(--muted-foreground);
+    font-size: 14px;
+    line-height: 2;
+    margin-top: 9px;
+  }
+  .hero-links {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    font-size: 12px;
+    margin-top: 26px;
+  }
+  .hero-links a:hover {
+    color: var(--accent);
+  }
+  .hero-links a span {
+    margin-left: 4px;
+    color: var(--muted-foreground);
+  }
+  .link-divider {
+    color: var(--border);
+  }
+  .hero-side-note {
+    position: absolute;
+    right: 0;
+    bottom: 54px;
+    writing-mode: vertical-rl;
+    font-family: ui-monospace, monospace;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    color: var(--muted-foreground);
+    opacity: 0.7;
+  }
+  .topics {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    padding: 24px 0;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+  .topic {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding-right: 25px;
+  }
+  .topic + .topic {
+    padding-left: 24px;
+    border-left: 1px solid var(--border);
+  }
+  .topic-num {
+    font:
+      10px ui-monospace,
+      monospace;
+    color: var(--muted-foreground);
+    padding-top: 5px;
+  }
+  .topic-name {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+  }
+  .topic-en {
+    display: block;
+    font-size: 9px;
+    color: var(--muted-foreground);
+    margin-top: 5px;
+  }
+  .topic-arrow {
+    color: var(--muted-foreground);
+    margin-left: auto;
+    font-size: 12px;
+  }
+  .topic:hover .topic-name,
+  .topic:hover .topic-arrow {
+    color: var(--accent);
+  }
+  .notes {
+    padding-top: 49px;
+  }
+  .section-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 12px;
+  }
+  .section-heading h2 {
+    font-size: 17px;
+    font-weight: 550;
+    letter-spacing: 0.025em;
+  }
+  .section-heading > a {
+    font-size: 11px;
+  }
+  .note-count {
+    font:
+      10px ui-monospace,
+      monospace;
+    color: var(--muted-foreground);
+    display: inline-block;
+    margin-left: 8px;
+    vertical-align: middle;
+  }
+  .notes-end {
+    display: flex;
+    align-items: center;
+    padding-top: 32px;
+    gap: 9px;
+    font-size: 11px;
+    color: var(--muted-foreground);
+  }
+  .end-mark {
+    font-size: 17px;
+    color: var(--accent);
+  }
+  .notes-end a {
+    margin-left: auto;
+  }
+  .empty-notes {
+    padding: 40px 0;
+    color: var(--muted-foreground);
+  }
+  @media (max-width: 600px) {
+    .hero {
+      padding-top: 41px;
+      padding-bottom: 33px;
+    }
+    h1 {
+      margin: 20px 0;
+    }
+    .hero-side-note,
+    .desktop-break {
+      display: none;
+    }
+    .topics {
+      padding: 19px 0;
+      gap: 14px;
+    }
+    .topic {
+      padding-right: 0;
+      gap: 6px;
+    }
+    .topic + .topic {
+      padding-left: 12px;
+    }
+    .topic-num,
+    .topic-en,
+    .topic-arrow {
+      display: none;
+    }
+    .topic-name {
+      font-size: 12px;
+    }
+    .notes {
+      padding-top: 35px;
+    }
+    .notes-end {
+      flex-wrap: wrap;
+    }
+  }
+</style>

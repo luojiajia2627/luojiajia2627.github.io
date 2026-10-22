@@ -1,0 +1,5 @@
+import sharp from "sharp";
+import { fileURLToPath } from "node:url";
+const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630"><rect width="1200" height="630" fill="#fafbf9"/><rect x="80" y="85" width="70" height="75" rx="12" fill="#30745c"/><text x="94" y="140" fill="#fff" font-family="Georgia,serif" font-size="57">L.</text><text x="80" y="260" fill="#747e77" font-family="sans-serif" font-size="22" letter-spacing="5">LILY’S TECH NOTES</text><text x="75" y="370" fill="#25312c" font-family="sans-serif" font-size="80" font-weight="600">罗佳佳 Lily</text><line x1="80" y1="460" x2="1120" y2="460" stroke="#e2e7e1"/><text x="80" y="520" fill="#30745c" font-family="sans-serif" font-size="23">Diffusion Language Models / Recommender Systems / Web Development</text><text x="80" y="570" fill="#747e77" font-family="sans-serif" font-size="19">luojiajia2627.github.io</text></svg>';
+await sharp(Buffer.from(svg)).png().toFile(fileURLToPath(new URL("../public/default-og.png", import.meta.url)));
+console.log("Generated public/default-og.png");

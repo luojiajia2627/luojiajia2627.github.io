@@ -1,0 +1,85 @@
+---
+import { getCollection } from "astro:content";
+import { getRelativeLocaleUrl } from "astro:i18n";
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import Main from "@/components/Main.astro";
+import Breadcrumb from "@/components/Breadcrumb.astro";
+import { getCategories } from "@/utils/getCategories";
+import config from "@/config";
+const categories = getCategories(await getCollection("posts"));
+---
+
+<Layout title={"文章分类 | " + config.site.title}>
+  <Header /><Breadcrumb />
+  <Main pageTitle="文章分类" pageDesc="三个方向，一点一点积累。">
+    <div class="category-list">
+      {
+        categories.map((category, index) => (
+          <a
+            href={getRelativeLocaleUrl(
+              config.site.lang,
+              "categories/" + category.slug
+            )}
+            class="category-item"
+          >
+            <>
+              <span class="eyebrow">{String(index + 1).padStart(2, "0")}</span>
+              <div>
+                <>
+                  <h2>{category.name}</h2>
+                  <p>{category.description}</p>
+                </>
+              </div>
+              <span class="category-count">
+                {category.posts.length} 篇 <span aria-hidden="true">↗</span>
+              </span>
+            </>
+          </a>
+        ))
+      }
+    </div>
+  </Main><Footer />
+</Layout>
+<style>
+  .category-item {
+    display: flex;
+    align-items: baseline;
+    gap: 25px;
+    padding: 30px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  h2 {
+    font-size: 19px;
+    font-weight: 550;
+    margin-bottom: 7px;
+  }
+  p {
+    font-size: 13px;
+    color: var(--muted-foreground);
+  }
+  .category-count {
+    margin-left: auto;
+    white-space: nowrap;
+    font-size: 12px;
+    color: var(--muted-foreground);
+  }
+  .category-count span {
+    margin-left: 15px;
+  }
+  .category-item:hover h2 {
+    color: var(--accent);
+  }
+  @media (max-width: 550px) {
+    .category-item {
+      gap: 15px;
+    }
+    .category-item > .eyebrow {
+      display: none;
+    }
+    .category-count span {
+      margin-left: 3px;
+    }
+  }
+</style>

@@ -1,0 +1,100 @@
+@import "tailwindcss";
+@import "./theme.css";
+@import "./typography.css";
+@import "rehype-callouts/theme/obsidian";
+
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
+
+@layer base {
+  * {
+    @apply border-border outline-accent/75;
+    scrollbar-width: auto;
+    scrollbar-color: var(--color-muted) transparent;
+  }
+  a,
+  button,
+  #main-content {
+    @apply outline-accent outline-offset-1 focus-visible:no-underline focus-visible:outline-2 focus-visible:outline-dashed;
+  }
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+}
+
+@utility max-w-app {
+  max-width: 880px;
+}
+
+@utility app-layout {
+  @apply max-w-app mx-auto w-full px-6 sm:px-8;
+}
+
+@utility active-nav {
+  @apply text-accent;
+}
+
+:target {
+  scroll-margin-block: 1rem;
+}
+
+body {
+  font-size: 15px;
+  line-height: 1.8;
+  -webkit-font-smoothing: antialiased;
+}
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+.eyebrow {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  color: var(--muted-foreground);
+}
+.quiet-link {
+  color: var(--muted-foreground);
+  transition: color 0.15s ease;
+}
+.quiet-link:hover {
+  color: var(--accent);
+}
+.app-prose {
+  font-size: 16px;
+  line-height: 2;
+}
+.app-prose h2 {
+  margin-top: 2.2em;
+  font-size: 1.45em;
+  letter-spacing: -0.025em;
+}
+.app-prose h3 {
+  font-style: normal;
+  font-size: 1.15em;
+}
+.app-prose pre,
+.app-prose code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.86em;
+}
+.app-prose pre {
+  border-radius: 8px;
+  padding: 1.4rem;
+}
+.app-prose blockquote {
+  font-style: normal;
+  font-weight: 400;
+}
+.app-prose details {
+  display: block;
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}

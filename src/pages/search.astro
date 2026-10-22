@@ -1,0 +1,253 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Breadcrumb from "@/components/Breadcrumb.astro";
+import Main from "@/components/Main.astro";
+import Footer from "@/components/Footer.astro";
+import IconSearch from "@/assets/icons/IconSearch.svg";
+import { getAssetPath } from "@/utils/withBase";
+import config from "@/config";
+---
+
+<Layout title={"搜索 | " + config.site.title}>
+  <Header /><Breadcrumb />
+  <Main pageTitle="搜索" pageDesc="输入关键词，搜索文章标题、标签与正文。">
+    <div id="blog-search" data-index-url={getAssetPath("search-index.json")}>
+      <form role="search" class="search-form">
+        <label for="search-input" class="sr-only">搜索文章</label><IconSearch
+          aria-hidden="true"
+        />
+        <input
+          id="search-input"
+          type="search"
+          placeholder="搜索文章标题或正文…"
+          autocomplete="off"
+          maxlength="120"
+          aria-describedby="search-status"
+        />
+        <button type="button" id="clear-search" aria-label="清除搜索" hidden
+          >清除</button
+        >
+      </form>
+      <p id="search-status" role="status" aria-live="polite">
+        试试「扩散」「推荐」，或一个正文里的关键词。
+      </p>
+      <ul id="search-results" aria-label="搜索结果"></ul>
+      <noscript
+        ><p>
+          请启用 JavaScript 以使用全文搜索，或通过文章分类浏览内容。
+        </p></noscript
+      >
+    </div>
+  </Main><Footer />
+</Layout>
+<script>
+  import type { SearchPost } from "@/types/search";
+  import { searchPosts } from "@/utils/searchPosts";
+  let indexPromise: Promise<SearchPost[]> | undefined;
+  function setupSearch() {
+    const root = document.querySelector<HTMLElement>("#blog-search");
+    const input = document.querySelector<HTMLInputElement>("#search-input");
+    const clear = document.querySelector<HTMLButtonElement>("#clear-search");
+    const status = document.querySelector<HTMLElement>("#search-status");
+    const results = document.querySelector<HTMLElement>("#search-results");
+    if (!root || !input || !clear || !status || !results) return;
+    const form = root.querySelector("form");
+    let generation = 0;
+    let timer: ReturnType<typeof setTimeout>;
+    const hint = "试试「扩散」「推荐」，或一个正文里的关键词。";
+    function highlight(element: HTMLElement, text: string, query: string) {
+      const terms = query
+        .toLocaleLowerCase()
+        .trim()
+        .split(/\s+/)
+        .filter(Boolean);
+      const lower = text.toLocaleLowerCase();
+      let cursor = 0;
+      while (cursor < text.length) {
+        const matches = terms
+          .map(term => ({ at: lower.indexOf(term, cursor), term }))
+          .filter(match => match.at >= cursor)
+          .sort((a, b) => a.at - b.at || b.term.length - a.term.length);
+        const next = matches[0];
+        if (!next) {
+          element.append(document.createTextNode(text.slice(cursor)));
+          break;
+        }
+        element.append(document.createTextNode(text.slice(cursor, next.at)));
+        const mark = document.createElement("mark");
+        mark.textContent = text.slice(next.at, next.at + next.term.length);
+        element.append(mark);
+        cursor = next.at + next.term.length;
+      }
+    }
+    async function search() {
+      if (!input || !status || !results || !clear || !root) return;
+      const current = ++generation;
+      const query = input.value.trim();
+      clear.hidden = !query;
+      const url = new URL(window.location.href);
+      if (query) url.searchParams.set("q", query);
+      else url.searchParams.delete("q");
+      history.replaceState(history.state, "", url.pathname + url.search);
+      results.replaceChildren();
+      if (!query) {
+        status.textContent = hint;
+        return;
+      }
+      status.textContent = "正在搜索…";
+      try {
+        indexPromise ??= fetch(root.dataset.indexUrl ?? "/search-index.json")
+          .then(response => {
+            if (!response.ok) throw new Error("Index unavailable");
+            return response.json();
+          })
+          .catch(error => {
+            indexPromise = undefined;
+            throw error;
+          });
+        const posts = await indexPromise;
+        if (current !== generation || !root.isConnected) return;
+        const matches = searchPosts(posts, query);
+        status.textContent = matches.length
+          ? "找到 " + matches.length + " 篇相关文章"
+          : "没有找到相关文章，换一个关键词试试。";
+        for (const post of matches) {
+          const item = document.createElement("li");
+          const meta = document.createElement("p");
+          meta.className = "search-result-meta";
+          meta.textContent =
+            post.category +
+            " · " +
+            new Intl.DateTimeFormat("zh-CN", {
+              timeZone: "Asia/Shanghai",
+            }).format(new Date(post.date)) +
+            (post.demo ? " · 示例文章" : "");
+          const heading = document.createElement("h2");
+          const link = document.createElement("a");
+          link.href = post.url;
+          highlight(link, post.title, query);
+          heading.append(link);
+          const excerpt = document.createElement("p");
+          excerpt.className = "search-excerpt";
+          const term = query.toLocaleLowerCase().trim().split(/\s+/)[0];
+          const position = post.content.toLocaleLowerCase().indexOf(term);
+          const source = position >= 0 ? post.content : post.description;
+          const start = Math.max(0, position - 35);
+          const text =
+            (start ? "…" : "") +
+            source.slice(start, start + 150) +
+            (source.length > start + 150 ? "…" : "");
+          highlight(excerpt, text, query);
+          item.append(meta, heading, excerpt);
+          results.append(item);
+        }
+      } catch {
+        if (current === generation)
+          status.textContent = "搜索暂时不可用，请稍后重新输入关键词。";
+      }
+    }
+    input.value =
+      new URLSearchParams(location.search).get("q")?.slice(0, 120) ?? "";
+    input.addEventListener("input", event => {
+      if ((event as InputEvent).isComposing) return;
+      clearTimeout(timer);
+      timer = setTimeout(search, 120);
+    });
+    input.addEventListener("compositionend", () => {
+      clearTimeout(timer);
+      timer = setTimeout(search, 120);
+    });
+    form?.addEventListener("submit", event => {
+      event.preventDefault();
+      clearTimeout(timer);
+      void search();
+    });
+    clear.addEventListener("click", () => {
+      input.value = "";
+      clearTimeout(timer);
+      void search();
+      input.focus();
+    });
+    void search();
+  }
+  document.addEventListener("astro:page-load", setupSearch);
+</script>
+<style>
+  .search-form {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 12px 17px;
+    margin-top: 30px;
+  }
+  .search-form:focus-within {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px var(--muted);
+  }
+  .search-form :global(svg) {
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    color: var(--muted-foreground);
+  }
+  input {
+    width: 100%;
+    min-width: 0;
+    background: transparent;
+    outline: none;
+    border: 0;
+    font-size: 15px;
+    padding: 4px 0;
+  }
+  input:focus-visible {
+    outline: none;
+  }
+  input::placeholder {
+    color: var(--muted-foreground);
+  }
+  input::-webkit-search-cancel-button {
+    display: none;
+  }
+  #clear-search {
+    color: var(--muted-foreground);
+    font-size: 11px;
+    flex-shrink: 0;
+  }
+  #search-status {
+    margin: 23px 0 10px;
+    color: var(--muted-foreground);
+    font-size: 12px;
+  }
+  #search-results :global(li) {
+    padding: 25px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  #search-results :global(h2) {
+    font-size: 18px;
+    line-height: 1.8;
+    font-weight: 550;
+    margin: 8px 0;
+  }
+  #search-results :global(a:hover) {
+    color: var(--accent);
+  }
+  #search-results :global(.search-result-meta) {
+    color: var(--muted-foreground);
+    font-size: 11px;
+  }
+  #search-results :global(.search-excerpt) {
+    color: var(--muted-foreground);
+    font-size: 13px;
+    line-height: 1.9;
+    overflow-wrap: anywhere;
+  }
+  #search-results :global(mark) {
+    color: var(--accent);
+    background: var(--muted);
+    border-radius: 2px;
+    padding: 0 2px;
+  }
+</style>
