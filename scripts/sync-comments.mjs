@@ -1,5 +1,5 @@
 // Runs after the site build in GitHub Actions. No credentials enter the site bundle.
-import { readFile, writeFile } from "node:fs/promises";
+import { readFile, writeFile, mkdir } from "node:fs/promises";
 const repo = process.env.GITHUB_REPOSITORY;
 const token = process.env.GH_TOKEN;
 if (!repo || !token) throw new Error("评论同步需要 GitHub Actions 的 GITHUB_REPOSITORY 和 GH_TOKEN。");
@@ -21,6 +21,7 @@ for (let page = 1; ; page++) {
   if (batch.length < 100) break;
 }
 const map = {};
+await mkdir("dist/comment-snapshots", { recursive: true });
 for (const page of pages) {
   const encodedPath = new URL(page.path, "https://luojiajia2627.github.io").pathname;
   const path = "/" + encodedPath.split("/").filter(Boolean).join("/") + "/";
@@ -34,6 +35,17 @@ for (const page of pages) {
     console.log(`已创建评论区 #${issue.number}：${page.title}`);
   }
   map[path] = { number: issue.number, url: issue.html_url };
+  const comments = [];
+  for (let pageNumber = 1; ; pageNumber++) {
+    const batch = await api(`/issues/${issue.number}/comments?per_page=100&page=${pageNumber}`);
+    comments.push(...batch.map(comment => ({
+      body: comment.body,
+      created_at: comment.created_at,
+      user: { login: comment.user?.login ?? "GitHub 用户" },
+    })));
+    if (batch.length < 100) break;
+  }
+  await writeFile(`dist/comment-snapshots/${issue.number}.json`, JSON.stringify(comments));
 }
 await writeFile("dist/comment-threads.json", JSON.stringify(map));
 console.log(`评论区已同步，共 ${Object.keys(map).length} 个。`);

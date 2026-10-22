@@ -3,6 +3,8 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+  issue_comment:
+    types: [created, edited, deleted]
 permissions:
   contents: read
   issues: write
@@ -13,6 +15,10 @@ concurrency:
   cancel-in-progress: false
 jobs:
   build:
+    if: >-
+      github.event_name != 'issue_comment' ||
+      (contains(github.event.issue.body, '<!-- lily-blog:') &&
+      (github.event.issue.user.login == 'github-actions[bot]' || github.event.issue.user.login == github.repository_owner))
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
