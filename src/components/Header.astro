@@ -20,7 +20,9 @@ const links = [
 <a id="skip-to-content" class="skip-link" href="#main-content">跳转到正文</a>
 <header class="app-layout site-header">
   <a href={url("")} class="wordmark" aria-label="罗佳佳 Lily · 首页"
-    >Lily<span class="wordmark-dot">.</span></a
+    ><span class="monogram" aria-hidden="true">L.</span><span
+      >罗佳佳 <span class="wordmark-lily">Lily</span></span
+    ></a
   >
   <div class="header-right">
     <nav id="nav-menu" aria-label="主导航">
@@ -92,15 +94,31 @@ const links = [
     align-items: center;
     justify-content: space-between;
     gap: 20px;
-    min-height: 92px;
+    min-height: 100px;
     position: relative;
-    border-bottom: 1px solid var(--border);
   }
   .wordmark {
-    font: 25px var(--font-editorial);
-    letter-spacing: -0.05em;
+    display: inline-flex;
+    align-items: center;
+    gap: 11px;
+    font-weight: 600;
+    letter-spacing: -0.025em;
+    white-space: nowrap;
   }
-  .wordmark-dot {
+  .monogram {
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 32px;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    font-family: Georgia, serif;
+    font-size: 21px;
+    color: var(--accent);
+  }
+  .wordmark-lily {
+    margin-left: 3px;
+    font-weight: 400;
     color: var(--muted-foreground);
   }
   .header-right,
@@ -110,8 +128,8 @@ const links = [
     align-items: center;
   }
   .nav-links {
-    gap: 21px;
-    font-size: 12px;
+    gap: 23px;
+    font-size: 13px;
   }
   .nav-links a {
     color: var(--muted-foreground);
@@ -122,8 +140,8 @@ const links = [
     color: var(--accent);
   }
   .header-tools {
-    margin-left: 21px;
-    padding-left: 15px;
+    margin-left: 25px;
+    padding-left: 18px;
     gap: 5px;
     border-left: 1px solid var(--border);
   }
@@ -132,7 +150,7 @@ const links = [
     place-items: center;
     height: 34px;
     width: 34px;
-    border-radius: 2px;
+    border-radius: 6px;
     color: var(--muted-foreground);
   }
   .icon-button:hover {
@@ -178,7 +196,8 @@ const links = [
       gap: 8px;
     }
     .wordmark {
-      font-size: 25px;
+      gap: 8px;
+      font-size: 14px;
     }
     .icon-button {
       width: 30px;
