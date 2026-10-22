@@ -20,11 +20,7 @@ const links = [
 <a id="skip-to-content" class="skip-link" href="#main-content">跳转到正文</a>
 <header class="app-layout site-header">
   <a href={url("")} class="wordmark" aria-label="罗佳佳 Lily · 首页"
-    ><span class="monogram" aria-hidden="true">L<span>↗</span></span><span
-      >罗佳佳 <span class="wordmark-lily"
-        >Lily<small>PERSONAL LAB / 个人实验室</small></span
-      ></span
-    ></a
+    >Lily<span class="wordmark-dot">.</span></a
   >
   <div class="header-right">
     <nav id="nav-menu" aria-label="主导航">
@@ -96,47 +92,15 @@ const links = [
     align-items: center;
     justify-content: space-between;
     gap: 20px;
-    min-height: 106px;
+    min-height: 92px;
     position: relative;
     border-bottom: 1px solid var(--border);
   }
   .wordmark {
-    display: inline-flex;
-    align-items: center;
-    gap: 11px;
-    font-weight: 600;
-    letter-spacing: -0.025em;
-    white-space: nowrap;
+    font: 25px var(--font-editorial);
+    letter-spacing: -0.05em;
   }
-  .monogram {
-    display: grid;
-    place-items: center;
-    width: 39px;
-    height: 42px;
-    border: 1px solid var(--accent);
-    font-family: var(--font-mono);
-    font-size: 27px;
-    color: var(--accent-foreground);
-    background: var(--accent);
-    position: relative;
-    line-height: 1;
-    padding-right: 6px;
-  }
-  .monogram > span {
-    font-size: 13px;
-    position: absolute;
-    right: 4px;
-    top: 5px;
-  }
-  .wordmark-lily small {
-    display: block;
-    font: 8px var(--font-mono);
-    letter-spacing: 0.07em;
-    margin-top: 3px;
-  }
-  .wordmark-lily {
-    margin-left: 3px;
-    font-weight: 400;
+  .wordmark-dot {
     color: var(--muted-foreground);
   }
   .header-right,
@@ -146,8 +110,8 @@ const links = [
     align-items: center;
   }
   .nav-links {
-    gap: 23px;
-    font-size: 13px;
+    gap: 21px;
+    font-size: 12px;
   }
   .nav-links a {
     color: var(--muted-foreground);
@@ -158,8 +122,8 @@ const links = [
     color: var(--accent);
   }
   .header-tools {
-    margin-left: 25px;
-    padding-left: 18px;
+    margin-left: 21px;
+    padding-left: 15px;
     gap: 5px;
     border-left: 1px solid var(--border);
   }
@@ -214,16 +178,7 @@ const links = [
       gap: 8px;
     }
     .wordmark {
-      gap: 8px;
-      font-size: 14px;
-    }
-    .monogram {
-      width: 34px;
-      height: 38px;
       font-size: 25px;
-    }
-    .wordmark-lily small {
-      font-size: 6.5px;
     }
     .icon-button {
       width: 30px;

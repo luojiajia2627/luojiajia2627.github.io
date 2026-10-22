@@ -3,8 +3,8 @@ import { getCollection } from "astro:content";
 import Layout from "@/layouts/Layout.astro";
 import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
+import Card from "@/components/Card.astro";
 import { getSortedPosts } from "@/utils/getSortedPosts";
-import { getPostUrl } from "@/utils/getPostPaths";
 const thoughts = getSortedPosts(await getCollection("posts")).filter(
   post => post.data.kind === "thought"
 );
@@ -12,166 +12,26 @@ const thoughts = getSortedPosts(await getCollection("posts")).filter(
 
 <Layout
   title="个人思考 | 罗佳佳 Lily"
-  description="给尚未成形的想法留一点空间。研究之外，也记录问题、观察与日常思考。"
+  description="记录问题、观察，以及尚未成形的个人思考。"
 >
   <Header /><main id="main-content" class="app-layout collection-page">
     <div class="page-heading">
-      <div>
-        <p class="eyebrow">02 / THINKING OUT LOUD</p><h1>
-          允许想法，尚未完成<span>。</span>
-        </h1><p>不急着得到结论。记录问题、观察，以及思考发生的过程。</p>
-      </div><span class="thought-mark" aria-hidden="true">[ ? ]</span>
+      <div><h1>个人思考</h1><p>记录一些问题和观察，允许想法尚未完成。</p></div>
     </div>
     <div class="collection-toolbar">
-      <span>{thoughts.length} 条思考 · 持续修订中</span><a
-        href="/posts/"
-        class="quiet-link">去看技术文章 →</a>
+      <span>{thoughts.length} 条思考</span><a href="/posts/" class="quiet-link"
+        >技术文章 →</a>
     </div>
-    <ol class="thought-timeline">
-      {
-        thoughts.map((post, index) => (
-          <li>
-            <>
-              <div class="timeline-meta">
-                <>
-                  <span>
-                    {String(thoughts.length - index).padStart(2, "0")}
-                  </span>
-                  <time datetime={post.data.pubDatetime.toISOString()}>
-                    {post.data.pubDatetime
-                      .toLocaleDateString("zh-CN", {
-                        timeZone: "Asia/Shanghai",
-                        year: "numeric",
-                        month: "2-digit",
-                        day: "2-digit",
-                      })
-                      .replaceAll("/", ".")}
-                  </time>
-                </>
-              </div>
-              <a class="thought-card" href={getPostUrl(post.id, post.filePath)}>
-                <>
-                  <div class="thought-card-label">
-                    {post.data.demo
-                      ? "栏目示例 · 等待你的真实想法"
-                      : "FIELD NOTE"}
-                    <span aria-hidden="true">↗</span>
-                  </div>
-                  <h2>{post.data.title}</h2>
-                  <p>{post.data.description}</p>
-                  <div class="thought-tags">
-                    {post.data.tags.map(tag => (
-                      <span>#{tag}</span>
-                    ))}
-                  </div>
-                </>
-              </a>
-            </>
-          </li>
-        ))
-      }
-    </ol>
+    <ul>{thoughts.map(post => <Card {...post} />)}</ul>
     {
       thoughts.length === 0 && (
         <div class="empty-state">
           <>
-            <span aria-hidden="true">[ ? ]</span>
-            <h2>给第一个想法，留一个位置。</h2>
+            <h2>第一条思考，留给未来的自己。</h2>
             <p>可以从一个暂时没有答案的问题开始。</p>
           </>
         </div>
       )
     }
-    <aside class="library-note">
-      <span aria-hidden="true">↳</span><p>
-        这里的想法可以改变。与其把每一次记录写成答案，更希望它成为下一次提问的起点。
-      </p>
-    </aside>
   </main><Footer />
 </Layout>
-<style>
-  .thought-mark {
-    font: 52px var(--font-mono);
-    color: var(--accent);
-    letter-spacing: -0.1em;
-  }
-  .thought-timeline {
-    margin-top: 30px;
-  }
-  .thought-timeline li {
-    display: grid;
-    grid-template-columns: 115px minmax(0, 1fr);
-    gap: 35px;
-    padding-bottom: 30px;
-  }
-  .timeline-meta {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    padding-top: 20px;
-    font: 10px var(--font-mono);
-    color: var(--muted-foreground);
-  }
-  .timeline-meta > span {
-    color: var(--accent);
-    font-size: 18px;
-  }
-  .thought-card {
-    padding: 25px 30px;
-    border: 1px solid var(--border);
-    border-left: 2px solid var(--accent);
-    background: var(--surface);
-  }
-  .thought-card:hover {
-    border-color: var(--accent);
-  }
-  .thought-card-label {
-    display: flex;
-    justify-content: space-between;
-    color: var(--accent);
-    font: 10px var(--font-mono);
-  }
-  .thought-card-label span {
-    font-size: 18px;
-  }
-  h2 {
-    font-size: 24px;
-    line-height: 1.6;
-    letter-spacing: -0.025em;
-    font-weight: 550;
-    margin: 13px 0;
-  }
-  .thought-card p {
-    color: var(--muted-foreground);
-    font-size: 13px;
-    line-height: 1.9;
-  }
-  .thought-tags {
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-    color: var(--muted-foreground);
-    font-size: 10px;
-    margin-top: 25px;
-  }
-  @media (max-width: 600px) {
-    .thought-mark {
-      display: none;
-    }
-    .thought-timeline li {
-      grid-template-columns: 1fr;
-      gap: 12px;
-    }
-    .timeline-meta {
-      flex-direction: row;
-      align-items: center;
-      gap: 15px;
-    }
-    .thought-card {
-      padding: 22px;
-    }
-    h2 {
-      font-size: 21px;
-    }
-  }
-</style>

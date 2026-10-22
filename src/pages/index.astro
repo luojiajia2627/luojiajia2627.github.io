@@ -4,7 +4,6 @@ import Layout from "@/layouts/Layout.astro";
 import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
 import Card from "@/components/Card.astro";
-import LabDiagram from "@/components/LabDiagram.astro";
 import { getSortedPosts } from "@/utils/getSortedPosts";
 import { getPostUrl } from "@/utils/getPostPaths";
 import { slugifyStr } from "@/utils/slugify";
@@ -13,127 +12,86 @@ const all = getSortedPosts(await getCollection("posts"));
 const posts = all.filter(post => post.data.kind === "article");
 const thoughts = all.filter(post => post.data.kind === "thought");
 const documents = await getDocuments();
-const topics = [
-  {
-    name: "扩散语言模型",
-    en: "Diffusion Language Models",
-    num: "01",
-    symbol: "∿",
-  },
-  { name: "推荐算法", en: "Recommender Systems", num: "02", symbol: "⋈" },
-  { name: "前后端开发", en: "Web Development", num: "03", symbol: "⌘" },
-];
+const topics = ["扩散语言模型", "推荐算法", "前后端开发"];
 ---
 
-<Layout
-  ><Header />
-  <main id="main-content" class="app-layout" data-home-path="/">
-    <section class="hero">
-      <div class="hero-copy">
-        <p class="eyebrow hero-eyebrow">
-          <span class="tiny-dot" aria-hidden="true"></span> LILY’S PERSONAL LAB <span
-            class="hero-coordinate">NOTES / CODE / IDEAS</span>
-        </p><h1>
-          让好奇心，<br /><span class="ink-line">有迹可循</span><span
-            class="title-dot">。</span>
-        </h1><p class="hero-intro">你好，我是<span>罗佳佳 Lily</span>。</p><p
-          class="hero-description"
-        >
-          在模型与应用之间探索，<br
-          />把研究中的问题、代码里的发现，和日常的思考，<br
-            class="desktop-break"
-          />放进这间持续生长的个人实验室。
-        </p><div class="hero-links">
-          <a class="lab-button" href="/posts/"
-            >翻开技术笔记 <span aria-hidden="true">↗</span></a
-          ><a href="/about/" class="quiet-link">认识一下 →</a>
-        </div><div class="hero-index">
-          <span>01 / 学习</span><span>02 / 实验</span><span>03 / 记录</span><i
-            aria-hidden="true"></i><span>ALWAYS IN PROGRESS</span>
-        </div>
+<Layout>
+  <Header />
+  <main id="main-content" class="app-layout home" data-home-path="/">
+    <section class="intro" aria-labelledby="intro-heading">
+      <h1 id="intro-heading">罗佳佳 <em>Lily</em></h1>
+      <p>
+        记录技术学习与实践，也写一些个人思考。<br
+        />在模型、算法和代码之间，慢慢积累自己的理解。
+      </p>
+      <div class="interests" aria-label="关注的技术方向">
+        {
+          topics.map(topic => (
+            <a href={"/categories/" + slugifyStr(topic) + "/"}>{topic}</a>
+          ))
+        }
       </div>
-      <div class="hero-figure"><LabDiagram /></div>
+      <div class="intro-links">
+        <a href="/about/">关于我</a><a
+          href="https://github.com/luojiajia2627"
+          target="_blank"
+          rel="noopener noreferrer">GitHub ↗</a
+        ><a href="/rss.xml">RSS</a>
+      </div>
     </section>
-    <section class="topics" aria-label="技术方向">
-      {
-        topics.map(topic => (
-          <a href={"/categories/" + slugifyStr(topic.name) + "/"} class="topic">
-            <>
-              <span class="topic-num">/{topic.num}</span>
-              <span class="topic-symbol" aria-hidden="true">
-                {topic.symbol}
-              </span>
-              <span class="topic-text">
-                <>
-                  <span class="topic-name">{topic.name}</span>
-                  <span class="topic-en">{topic.en}</span>
-                </>
-              </span>
-              <span class="topic-arrow" aria-hidden="true">
-                ↗
-              </span>
-            </>
-          </a>
-        ))
-      }
-    </section>
-    <section class="notes" aria-labelledby="notes-heading">
+    <section class="recent" aria-labelledby="recent-heading">
       <div class="section-heading">
-        <div>
-          <p class="eyebrow">01 / RESEARCH & BUILD</p><h2 id="notes-heading">
-            最近的技术笔记 <span class="note-count"
-              >{String(posts.length).padStart(2, "0")}</span>
-          </h2>
-        </div><a href="/posts/" class="quiet-link">全部文章 →</a>
-      </div><ul>
-        {posts.slice(0, 4).map(post => <Card variant="h3" {...post} />)}
-      </ul>{
-        posts.length === 0 && <p class="empty-notes">第一篇笔记正在路上。</p>
-      }
+        <h2 id="recent-heading">最近文章</h2><a href="/posts/">全部文章</a>
+      </div>
+      <ul>{posts.slice(0, 4).map(post => <Card variant="h3" {...post} />)}</ul>
+      {posts.length === 0 && <p class="empty-note">第一篇笔记正在路上。</p>}
     </section>
-    <section class="desk" aria-label="思考与资料">
-      <div class="desk-thought">
+    <div class="reading-desk">
+      <section aria-labelledby="thoughts-heading">
         <div class="section-heading">
-          <div>
-            <p class="eyebrow">02 / THINKING OUT LOUD</p><h2>
-              想法，先放这里<span class="blue-dot">。</span>
-            </h2>
-          </div><span class="question-mark" aria-hidden="true">[ ? ]</span>
+          <h2 id="thoughts-heading">个人思考</h2><a href="/thoughts/">全部</a>
         </div>{
           thoughts[0] ? (
-            <a
-              class="thought-preview"
-              href={getPostUrl(thoughts[0].id, thoughts[0].filePath)}
-            >
+            <div class="small-entry">
               <>
-                <span class="preview-label">
-                  {thoughts[0].data.demo ? "栏目示例" : "最近的一条思考"} ↗
-                </span>
-                <h3>{thoughts[0].data.title}</h3>
+                <a href={getPostUrl(thoughts[0].id, thoughts[0].filePath)}>
+                  <h3>{thoughts[0].data.title}</h3>
+                </a>
                 <p>{thoughts[0].data.description}</p>
+                {thoughts[0].data.demo && (
+                  <span class="entry-meta">栏目示例</span>
+                )}
               </>
-            </a>
+            </div>
           ) : (
-            <p class="desk-description">一个还没想明白的问题，也值得记录。</p>
+            <p class="empty-note">给还没想明白的问题，留一点空间。</p>
           )
-        }<a href="/thoughts/" class="desk-link">进入个人思考 →</a>
-      </div><div class="desk-library">
-        <div>
-          <p class="eyebrow">03 / THE READING ROOM</p><div
-            class="library-icon"
-            aria-hidden="true"
-          >
-            <span>PDF</span><i></i><i></i><i></i>
-          </div><h2>值得回看的，<br />收进资料库。</h2><p>
-            研究笔记、阅读资料与文档。<br />{documents.length} 份 PDF，在线读，也可以带走。
-          </p>
-        </div><a href="/library/" class="desk-link">翻阅 PDF 资料 →</a>
-      </div>
-    </section>
-    <div class="notes-end">
-      <span aria-hidden="true">＋</span><p>保持提问，持续迭代。</p><a
-        href="/rss.xml"
-        class="quiet-link">订阅这间实验室 RSS ↗</a>
+        }
+      </section>
+      <section aria-labelledby="library-heading">
+        <div class="section-heading">
+          <h2 id="library-heading">资料</h2><a href="/library/">全部</a>
+        </div>{
+          documents.slice(0, 2).map(doc => (
+            <div class="small-entry">
+              <>
+                <a href={doc.url}>
+                  <h3>{doc.title}</h3>
+                </a>
+                <p>{doc.description}</p>
+                <span class="entry-meta">
+                  PDF · {doc.sizeLabel}
+                  {doc.demo && " · 功能示例"}
+                </span>
+              </>
+            </div>
+          ))
+        }{
+          documents.length === 0 && (
+            <p class="empty-note">保存一些值得回看的阅读资料。</p>
+          )
+        }
+      </section>
     </div>
   </main><Footer />
 </Layout>
@@ -144,393 +102,116 @@ const topics = [
   });
 </script>
 <style>
-  .hero {
-    display: grid;
-    grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
-    gap: 65px;
-    align-items: center;
-    padding: 62px 0 48px;
-  }
-  .hero-eyebrow {
-    display: flex;
-    align-items: center;
-    gap: 9px;
-    font-size: 9px;
-    color: var(--accent);
-    letter-spacing: 0.12em;
-  }
-  .tiny-dot {
-    width: 5px;
-    height: 5px;
-    background: var(--accent);
-    border-radius: 50%;
-  }
-  .hero-coordinate {
-    margin-left: auto;
-    font-size: 8px;
-    opacity: 0.6;
+  .intro {
+    padding: 73px 0 61px;
   }
   h1 {
-    font-size: clamp(39px, 5.4vw, 60px);
-    line-height: 1.45;
-    letter-spacing: -0.065em;
-    font-weight: 600;
-    margin: 25px 0 28px;
-  }
-  .ink-line {
-    position: relative;
-    z-index: 0;
-  }
-  .ink-line:after {
-    content: "";
-    position: absolute;
-    bottom: 4px;
-    left: 1px;
-    width: 100%;
-    height: 8px;
-    background: var(--accent);
-    opacity: 0.17;
-    z-index: -1;
-  }
-  .title-dot {
-    color: var(--accent);
-  }
-  .hero-intro {
-    color: var(--muted-foreground);
-    font-size: 13px;
-  }
-  .hero-intro > span {
-    color: var(--foreground);
-    margin-left: 5px;
+    font-family: var(--font-editorial);
+    font-size: 38px;
+    line-height: 1.4;
     font-weight: 500;
+    letter-spacing: -0.035em;
   }
-  .hero-description {
+  h1 em {
+    font-weight: 400;
+    margin-left: 8px;
+  }
+  .intro > p {
     color: var(--muted-foreground);
-    font-size: 13px;
+    font-size: 15px;
     line-height: 2;
-    margin-top: 12px;
+    margin-top: 22px;
   }
-  .hero-links {
+  .interests {
     display: flex;
-    align-items: center;
-    gap: 25px;
-    margin-top: 25px;
+    flex-wrap: wrap;
+    gap: 9px 20px;
+    margin-top: 22px;
+    font-size: 12px;
+    color: var(--muted-foreground);
+  }
+  .interests a:hover {
+    color: var(--foreground);
+  }
+  .intro-links {
+    display: flex;
+    gap: 21px;
+    margin-top: 26px;
     font-size: 12px;
   }
-  .hero-index {
-    display: flex;
-    align-items: center;
-    gap: 17px;
-    font: 8px var(--font-mono);
-    color: var(--muted-foreground);
-    margin-top: 35px;
-    flex-wrap: wrap;
+  .intro-links a {
+    text-decoration: underline;
+    text-underline-offset: 5px;
+    text-decoration-color: var(--border);
   }
-  .hero-index i {
-    width: 20px;
-    height: 1px;
-    background: var(--border);
-  }
-  .hero-figure {
-    padding: 10px 8px 10px 0;
-  }
-  .topics {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    border-top: 1px solid var(--border);
-    border-bottom: 1px solid var(--border);
-    padding: 23px 0;
-  }
-  .topic {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    padding-right: 20px;
-  }
-  .topic + .topic {
-    padding-left: 24px;
-    border-left: 1px solid var(--border);
-  }
-  .topic-num {
-    font: 9px var(--font-mono);
-    color: var(--muted-foreground);
-  }
-  .topic-symbol {
-    color: var(--accent);
-    font-size: 27px;
-    line-height: 1;
-    font-family: var(--font-mono);
-  }
-  .topic-name {
-    display: block;
-    font-size: 13px;
-    font-weight: 550;
-  }
-  .topic-en {
-    display: block;
-    font: 8px var(--font-mono);
-    color: var(--muted-foreground);
-    margin-top: 7px;
-  }
-  .topic-arrow {
-    margin-left: auto;
-    color: var(--muted-foreground);
-    font-size: 13px;
-  }
-  .topic:hover .topic-name,
-  .topic:hover .topic-arrow {
-    color: var(--accent);
-  }
-  .notes {
-    padding-top: 49px;
+  .intro-links a:hover {
+    text-decoration-color: var(--foreground);
   }
   .section-heading {
     display: flex;
+    align-items: baseline;
     justify-content: space-between;
-    align-items: center;
-    gap: 15px;
-    padding-bottom: 9px;
-  }
-  .section-heading .eyebrow {
-    font-size: 9px;
-    letter-spacing: 0.1em;
-    color: var(--accent);
+    gap: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
   }
   .section-heading h2 {
-    font-size: 23px;
+    font-size: 16px;
     font-weight: 550;
-    letter-spacing: -0.025em;
-    margin-top: 10px;
   }
   .section-heading > a {
     font-size: 11px;
-    align-self: flex-end;
-    padding-bottom: 6px;
-  }
-  .note-count {
-    font: 10px var(--font-mono);
     color: var(--muted-foreground);
-    display: inline-block;
-    margin-left: 10px;
-    vertical-align: middle;
   }
-  .desk {
+  .section-heading > a:hover {
+    color: var(--foreground);
+  }
+  .reading-desk {
     display: grid;
-    grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
-    margin-top: 56px;
-    border: 1px solid var(--border);
-    background: var(--surface);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 46px;
+    margin-top: 52px;
   }
-  .desk-thought {
-    padding: 29px 30px;
-    display: flex;
-    flex-direction: column;
+  .small-entry {
+    margin-top: 23px;
   }
-  .question-mark {
-    font: 26px var(--font-mono);
-    color: var(--accent);
-    letter-spacing: -0.1em;
-  }
-  .blue-dot {
-    color: var(--accent);
-  }
-  .thought-preview {
-    display: block;
-    margin-top: 24px;
-    margin-bottom: 30px;
-  }
-  .preview-label {
-    font: 9px var(--font-mono);
-    color: var(--muted-foreground);
-  }
-  .thought-preview h3 {
-    font-size: 20px;
-    line-height: 1.7;
-    letter-spacing: -0.025em;
-    font-weight: 550;
-    margin: 12px 0;
-  }
-  .thought-preview p,
-  .desk-description {
-    font-size: 12px;
-    color: var(--muted-foreground);
-    line-height: 1.95;
-  }
-  .desk-link {
-    font-size: 11px;
-    color: var(--accent);
-    margin-top: auto;
-  }
-  .desk-library {
-    border-left: 1px solid var(--border);
-    padding: 29px 30px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    gap: 26px;
-    position: relative;
-    overflow: hidden;
-    background-image:
-      linear-gradient(var(--grid-line) 1px, transparent 1px),
-      linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
-    background-size: 22px 22px;
-  }
-  .desk-library .eyebrow {
-    color: var(--accent);
-    font-size: 9px;
-  }
-  .desk-library h2 {
-    font-size: 26px;
-    letter-spacing: -0.025em;
+  .small-entry h3 {
+    font-size: 15px;
     font-weight: 500;
-    line-height: 1.6;
-    margin: 25px 0 15px;
+    line-height: 1.8;
   }
-  .desk-library p:not(.eyebrow) {
-    color: var(--muted-foreground);
+  .small-entry > p {
     font-size: 12px;
+    color: var(--muted-foreground);
     line-height: 1.9;
+    margin-top: 10px;
   }
-  .library-icon {
-    position: absolute;
-    right: 36px;
-    top: 87px;
-    width: 55px;
-    height: 75px;
-    border: 1px solid var(--accent);
-    color: var(--accent);
-    transform: rotate(9deg);
-    font: 12px var(--font-mono);
-    padding: 10px;
-    background: var(--surface);
-    opacity: 0.8;
-    box-shadow: 4px 4px 0 var(--muted);
-  }
-  .library-icon i {
+  .entry-meta {
     display: block;
-    height: 1px;
-    margin-top: 7px;
-    background: var(--border);
-  }
-  .notes-end {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding-top: 30px;
-    font-size: 11px;
+    font-size: 10px;
     color: var(--muted-foreground);
+    margin-top: 12px;
   }
-  .notes-end > span {
-    color: var(--accent);
-    font-size: 19px;
-  }
-  .notes-end a {
-    margin-left: auto;
-  }
-  .empty-notes {
-    padding: 40px 0;
+  .empty-note {
+    font-size: 13px;
+    line-height: 1.9;
     color: var(--muted-foreground);
+    padding-top: 23px;
   }
-  @media (max-width: 850px) {
-    .hero {
-      gap: 30px;
-    }
-    .hero-index {
-      gap: 10px;
-    }
-    .hero-index i,
-    .hero-index > span:last-child {
-      display: none;
-    }
-    .topic {
-      gap: 9px;
-    }
-    .topic + .topic {
-      padding-left: 17px;
-    }
-    .topic-en {
-      font-size: 7px;
-    }
-    .library-icon {
-      right: 22px;
-      opacity: 0.35;
-    }
-  }
-  @media (max-width: 650px) {
-    .hero {
-      grid-template-columns: 1fr;
-      padding: 36px 0;
-      gap: 31px;
+  @media (max-width: 600px) {
+    .intro {
+      padding: 46px 0 44px;
     }
     h1 {
-      font-size: 49px;
-      margin: 22px 0;
+      font-size: 33px;
     }
-    .hero-copy {
-      padding-right: 4px;
+    .intro > p {
+      font-size: 14px;
     }
-    .hero-description {
-      font-size: 13px;
-    }
-    .hero-coordinate {
-      display: none;
-    }
-    .hero-figure {
-      max-width: 350px;
-      width: 100%;
-      padding-right: 7px;
-      margin: 0 auto;
-    }
-    .hero-index {
-      margin-top: 26px;
-    }
-    .hero-eyebrow {
-      font-size: 8px;
-    }
-    .topic-symbol,
-    .topic-num,
-    .topic-arrow,
-    .topic-en {
-      display: none;
-    }
-    .topics {
-      padding: 19px 0;
-    }
-    .topic + .topic {
-      padding-left: 12px;
-    }
-    .topic {
-      padding-right: 8px;
-    }
-    .topic-name {
-      font-size: 12px;
-    }
-    .notes {
-      padding-top: 36px;
-    }
-    .section-heading h2 {
-      font-size: 20px;
-    }
-    .desk {
+    .reading-desk {
       grid-template-columns: 1fr;
+      gap: 36px;
       margin-top: 38px;
-    }
-    .desk-library {
-      border-left: 0;
-      border-top: 1px solid var(--border);
-    }
-    .library-icon {
-      opacity: 0.8;
-      right: 35px;
-    }
-    .notes-end {
-      flex-wrap: wrap;
-    }
-    .notes-end a {
-      margin-left: 0;
-    }
-    .desktop-break {
-      display: none;
     }
   }
 </style>

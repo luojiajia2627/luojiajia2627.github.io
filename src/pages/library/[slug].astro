@@ -21,7 +21,7 @@ const { doc } = Astro.props as { doc: BlogDocument };
   <Header /><main id="main-content" class="app-layout collection-page pdf-page">
     <a href="/library/" class="quiet-link back-link">← 返回 PDF 资料库</a>
     <header class="pdf-heading">
-      <p class="eyebrow">PDF / READING COPY {doc.demo && "· 功能示例"}</p><h1>
+      <p class="eyebrow">{doc.demo ? "功能示例" : "PDF 文档"}</p><h1>
         {doc.title}
       </h1><p>{doc.description}</p><div class="pdf-meta">
         <span>PDF · {doc.sizeLabel}</span>{doc.date && <time>{doc.date}</time>}{

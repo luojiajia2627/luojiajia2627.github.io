@@ -9,8 +9,8 @@ const { title = "交流与补充" } = Astro.props;
 >
   <div class="comments-heading">
     <div>
-      <p class="eyebrow">OPEN DISCUSSION</p><h2 id="comments-heading">
-        {title}<span aria-hidden="true"> ↗</span>
+      <h2 id="comments-heading">
+        {title}
       </h2>
     </div><a
       data-comment-link
@@ -180,7 +180,7 @@ const { title = "交流与补充" } = Astro.props;
     gap: 20px;
   }
   h2 {
-    font-size: 22px;
+    font-size: 19px;
     font-weight: 600;
     margin-top: 5px;
   }
@@ -195,7 +195,8 @@ const { title = "交流与补充" } = Astro.props;
   }
   .comment-status:not(:empty) {
     background: var(--muted);
-    border-left: 2px solid var(--accent);
+    border: 1px solid var(--border);
+    border-radius: 5px;
     padding: 18px;
   }
   .comment-list :global(li) {

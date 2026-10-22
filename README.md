@@ -1,6 +1,6 @@
 # 罗佳佳 Lily · 技术博客
 
-冷白与钴蓝的个人实验室风格技术博客，围绕**扩散语言模型、推荐算法、前后端开发**组织内容。基于 [AstroPaper](https://github.com/satnaing/astro-paper) 的 MIT 开源模板定制，保留原始 LICENSE 与署名。
+暖白与墨色的简约中文技术博客，围绕**扩散语言模型、推荐算法、前后端开发**组织内容。基于 [AstroPaper](https://github.com/satnaing/astro-paper) 的 MIT 开源模板定制，保留原始 LICENSE 与署名。
 
 正式发布地址配置为 **https://luojiajia2627.github.io/**。本地完成开发并不代表线上已经发布；是否上线以 GitHub Actions 的部署结果为准。
 
