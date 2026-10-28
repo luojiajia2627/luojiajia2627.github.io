@@ -54,7 +54,8 @@ pnpm test:math
 测试针对生产构建运行 Chromium，在 1280、390、320 像素宽度和明暗主题下验证
 HTML/MathML、字体加载、提示框、可展开目录、代码保留、主题按钮、页面宽度和公式局部滚动。
 另以禁用 JavaScript 的上下文检查预渲染结果。每种视口保存完整截图到 Playwright 测试结果。
-PR 的 CI 同样执行生产构建与这些检查。
+PR 的 CI 同样执行生产构建与这些检查，固定使用 Playwright 支持的 Ubuntu 24.04，
+避免 `ubuntu-latest` 升级后先于浏览器测试工具的系统支持。
 
 本地也可用 `pnpm dev` 打开两页，手动检查分式、根号、矩阵和滚动后的公式末尾。
 `pnpm preview` 用于检查 `dist/` 中的最终产物。自动测试中的手机验证为 Chromium 窄屏，

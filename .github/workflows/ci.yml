@@ -6,7 +6,8 @@ permissions:
   contents: read
 jobs:
   build:
-    runs-on: ubuntu-latest
+    # Keep the browser dependencies on a Playwright-supported LTS image.
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v7
