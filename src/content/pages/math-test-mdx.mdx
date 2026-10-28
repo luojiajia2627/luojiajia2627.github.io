@@ -1,0 +1,58 @@
+---
+title: 数学排版测试 · MDX
+description: 验证 MDX 继承统一数学处理链，并兼容 JSX。
+---
+
+## 文章目录
+
+## 中文与 JSX
+
+<p data-mdx-check="true">这是 MDX 的 JSX 元素。</p>
+
+用户 $u$ 的行内公式 $x_i^2+\alpha\leq\beta$ 应与中文共存，`$x_i$` 保持代码样式。
+
+## Recall@K 与 NDCG@K
+
+这些公式只用于排版验证，假设分母非零。
+
+$$
+\operatorname{Recall}@K(u)=\frac{|R_u\cap T_u^K|}{|R_u|}
+$$
+
+$$
+\begin{aligned}
+\operatorname{DCG}@K(u)&=\sum_{i=1}^K\frac{2^{r_{u,i}}-1}{\log_2(i+1)} \\
+\operatorname{NDCG}@K(u)&=\frac{\operatorname{DCG}@K(u)}{\operatorname{IDCG}@K(u)}
+\end{aligned}
+$$
+
+## 矩阵与多行推导
+
+$$
+X=\begin{bmatrix}1 & x_1 \\ 1 & x_2\end{bmatrix},\quad
+\theta=\begin{pmatrix}\theta_0 \\ \theta_1\end{pmatrix}
+$$
+
+$$
+\begin{aligned}
+\mathcal{L}(\theta)&=\frac{1}{N}\|X\theta-y\|_2^2 \\
+\nabla_\theta\mathcal{L}&=\frac{2}{N}X^\top(X\theta-y)
+\end{aligned}
+$$
+
+$$
+\forall x\in\mathbb{R}^d,\quad \mathbb{E}[X]=\int_{-\infty}^{\infty}x\,p(x)\,\mathrm{d}x
+$$
+
+## 提示框与代码
+
+> [!note] Obsidian 提示框
+> 行内公式 $\alpha+\beta=\gamma$。
+>
+> $$
+> p(x)=\frac{1}{\sqrt{2\pi}}e^{-x^2/2}
+> $$
+
+```tex
+$x_i$ \frac{a}{b}
+```
