@@ -1,0 +1,35 @@
+---
+import { getEntry, render } from "astro:content";
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+
+export function getStaticPaths() {
+  return ["markdown", "mdx"].map(format => ({ params: { format } }));
+}
+
+const format = Astro.params.format;
+const entry = await getEntry(
+  "pages",
+  format === "mdx" ? "math-test-mdx" : "math-test"
+);
+if (!entry) throw new Error("Missing math rendering fixture");
+const { Content } = await render(entry);
+---
+
+<Layout title={entry.data.title} description={entry.data.description}>
+  <meta slot="head" name="robots" content="noindex, nofollow" />
+  <Header />
+  <main id="main-content" class="app-layout article-page py-8">
+    <h1 class="mb-4 text-2xl font-semibold">{entry.data.title}</h1>
+    <p class="text-muted-foreground mb-6">
+      此页仅用于数学排版回归验证，不属于正式技术文章。
+      <a class="quiet-link underline" href="/math-test/markdown/">Markdown</a>
+      · <a class="quiet-link underline" href="/math-test/mdx/">MDX</a>
+    </p>
+    <article id="article" class="app-prose max-w-none">
+      <Content />
+    </article>
+  </main>
+  <Footer />
+</Layout>

@@ -29,6 +29,8 @@ public/pdfjs/
 
 # pnpm
 .pnpm-store
+playwright-report/
+test-results/
 
 # docker compose
 compose.override.yaml

@@ -6,6 +6,8 @@ import { unified } from "@astrojs/markdown-remark";
 import remarkToc from "remark-toc";
 import remarkCollapse from "remark-collapse";
 import rehypeCallouts from "rehype-callouts";
+import remarkMath from "remark-math";
+import rehypeKatex from "rehype-katex";
 import {
   transformerNotationDiff,
   transformerNotationHighlight,
@@ -20,7 +22,9 @@ export default defineConfig({
     mdx(),
     sitemap({
       filter: page =>
-        config.features?.showArchives !== false || !page.endsWith("/archives/"),
+        !new URL(page).pathname.startsWith("/math-test/") &&
+        (config.features?.showArchives !== false ||
+          !page.endsWith("/archives/")),
     }),
   ],
   i18n: {
@@ -32,8 +36,16 @@ export default defineConfig({
   },
   markdown: {
     processor: unified({
-      remarkPlugins: [remarkToc, [remarkCollapse, { test: "文章目录" }]],
-      rehypePlugins: [rehypeCallouts],
+      // MDX inherits this processor, including the math syntax extension.
+      remarkPlugins: [
+        remarkMath,
+        [remarkToc, { heading: "文章目录|(table[ -]of[ -])?contents?|toc" }],
+        [remarkCollapse, { test: "文章目录" }],
+      ],
+      rehypePlugins: [
+        rehypeCallouts,
+        [rehypeKatex, { output: "htmlAndMathml", trust: false }],
+      ],
     }),
     shikiConfig: {
       themes: { light: "min-light", dark: "night-owl" },

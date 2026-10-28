@@ -1,0 +1,29 @@
+/* Keep KaTeX's own metrics and fonts; inherit the site's theme colors. */
+.katex {
+  color: inherit;
+  font-size: 1.1em;
+}
+
+.app-prose .katex {
+  color: var(--foreground);
+}
+
+/* Tailwind's universal border color must not fade fraction/square-root rules. */
+.katex * {
+  border-color: currentColor;
+}
+
+/* Long derivations scroll locally instead of widening the page on phones.
+   Vertical padding leaves room for accents, fractions and equation tags. */
+.katex-display {
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-block: 0.4em;
+}
+
+.katex-display > .katex {
+  width: max-content;
+  min-width: 100%;
+  text-align: center;
+}
